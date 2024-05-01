@@ -1,8 +1,7 @@
-using Dapper;
-using infrastructure.datamodels;
+using Backend.infrastructure.dataModels;
 using Npgsql;
 
-namespace infrastructure.Reposotories;
+namespace Backend.infrastructure.Repositories;
 
 /**
  * Another class that is directly connected to the database.

@@ -1,4 +1,4 @@
-namespace infrastructure.datamodels;
+namespace Backend.infrastructure.dataModels;
 
 /**
  * This datamodel is for users

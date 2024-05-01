@@ -1,4 +1,4 @@
-namespace service;
+namespace Backend.service;
 
 /**
  * Class for tokens

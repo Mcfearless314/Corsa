@@ -1,8 +1,6 @@
-using Dapper;
-using infrastructure.datamodels;
 using Npgsql;
 
-namespace infrastructure.Reposotories;
+namespace Backend.infrastructure.Repositories;
 
 /**
  * The layer that is connected to the database, where all the users, passwords and hashes ect. are saved

@@ -1,7 +1,7 @@
-namespace infrastructure.datamodels;
+namespace Backend.infrastructure.dataModels;
 
 /**
- * This data model is for the pasword-hashes
+ * This data model is for the password-hashes
  */
 public class PasswordHash
 {

@@ -1,8 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
-using Backend.service;
 using Microsoft.IdentityModel.Tokens;
 
-namespace service;
+namespace Backend.service;
 
 /**
  * Class for creating and validating tokens

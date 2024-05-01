@@ -1,6 +1,6 @@
 using System.Security.Authentication;
-using infrastructure.datamodels;
-using infrastructure.Reposotories;
+using Backend.infrastructure.dataModels;
+using Backend.infrastructure.Repositories;
 
 namespace Backend.service;
 

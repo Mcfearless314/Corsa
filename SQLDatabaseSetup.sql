@@ -10,9 +10,9 @@ CREATE SCHEMA Corsa;
 
 create table Corsa.users
 (
-    id        SERIAL        PRIMARY KEY,
-    username  VARCHAR(50)   NOT NULL,
-    email     VARCHAR(50)   NOT NULL UNIQUE
+    id       SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    email    VARCHAR(50) NOT NULL UNIQUE
 );
 
 create table Corsa.password_hash
@@ -26,23 +26,29 @@ create table Corsa.password_hash
 
 CREATE TABLE Corsa.runs
 (
-    runID     SERIAL    PRIMARY KEY,
-    user_id   integer   NOT NULL,
-    timeOfRun timestamp NOT NULL,
-    distance  float     NOT NULL,
+    runID      SERIAL PRIMARY KEY,
+    user_id    integer   NOT NULL,
+    startOfRun timestamp NOT NULL,
+    endOfRun   timestamp,
+    timeOfRun  TIME,
+    distance   float,
     FOREIGN KEY (user_id) REFERENCES Corsa.users (id)
 );
 
 CREATE TABLE Corsa.maps
 (
-    mapID     SERIAL    NOT NULL,
-    lat       float     NOT NULL,
-    lng       float     NOT NULL,
-    time      timestamp NOT NULL,
+    mapID SERIAL    NOT NULL,
+    lat   float     NOT NULL,
+    lng   float     NOT NULL,
+    time  timestamp NOT NULL,
     FOREIGN KEY (mapID) REFERENCES Corsa.runs (runID)
 );
 
-SELECT * FROM Corsa.users;
-SELECT * FROM Corsa.password_hash;
-SELECT * FROM Corsa.runs;
-SELECT * FROM Corsa.maps;
+SELECT *
+FROM Corsa.users;
+SELECT *
+FROM Corsa.password_hash;
+SELECT *
+FROM Corsa.runs;
+SELECT *
+FROM Corsa.maps;
