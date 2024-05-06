@@ -12,7 +12,7 @@ public class ClientWantsToLogNewCoordinatesDto : BaseDto
 
     public double Lng { get; set; }
     
-    public double RunId { get; set; }
+    public string RunId { get; set; }
 }
 
 public class ClientWantsToLogNewCoordinates : BaseEventHandler<ClientWantsToLogNewCoordinatesDto>

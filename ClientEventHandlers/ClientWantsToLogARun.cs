@@ -14,7 +14,7 @@ public class ClientWantsToLogARunDto : BaseDto
 
     public double StartingLng { get; set; }
     
-    public double UserId { get; set; }
+    public int UserId { get; set; }
 }
 
 public class ClientWantsToLogARun : BaseEventHandler<ClientWantsToLogARunDto>
