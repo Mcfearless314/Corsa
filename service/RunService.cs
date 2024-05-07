@@ -50,4 +50,9 @@ public class RunService
     {
         return await _runRepository.GetAllRunsForUser(dtoUserId);
     }
+
+    public async Task<List<ProgressInfo>> GetProgressOfRunsForUser(int dtoUserId)
+    {
+        return await _runRepository.GetProgressOfRunsForUser(dtoUserId);
+    }
 }

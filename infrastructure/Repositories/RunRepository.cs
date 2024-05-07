@@ -25,9 +25,9 @@ public class RunRepository
             await using var transaction = await conn.BeginTransactionAsync();
             try
             {
-                // Insert into Corsa.runs
+                // Insert into corsa.runs
                 await using (var cmd = new NpgsqlCommand(
-                                 "INSERT INTO Corsa.runs (runID, startOfRun) VALUES (@runId, @startOfRun) RETURNING runID",
+                                 "INSERT INTO corsa.runs (runID, startOfRun) VALUES (@runId, @startOfRun) RETURNING runID",
                                  conn))
                 {
                     cmd.Parameters.AddWithValue("runId", runId);
@@ -35,9 +35,9 @@ public class RunRepository
                     insertedRunId = (string)await cmd.ExecuteScalarAsync();
                 }
 
-                // Insert into Corsa.maps
+                // Insert into corsa.maps
                 await using (var cmd = new NpgsqlCommand(
-                                 "INSERT INTO Corsa.maps (mapID, lat, lng, time) VALUES (@mapId, @lat, @lng, @time)",
+                                 "INSERT INTO corsa.maps (mapID, lat, lng, time) VALUES (@mapId, @lat, @lng, @time)",
                                  conn))
                 {
                     cmd.Parameters.AddWithValue("mapId", runId);
@@ -74,7 +74,7 @@ public class RunRepository
             await conn.OpenAsync();
 
             await using var cmd =
-                new NpgsqlCommand("INSERT INTO Corsa.maps (mapID, lat, lng, time) VALUES (@mapId, @lat, @lng, @time)",
+                new NpgsqlCommand("INSERT INTO corsa.maps (mapID, lat, lng, time) VALUES (@mapId, @lat, @lng, @time)",
                     conn);
             cmd.Parameters.AddWithValue("mapId", dtoRunId);
             cmd.Parameters.AddWithValue("lat", dtoLat);
@@ -102,9 +102,9 @@ public class RunRepository
             await using var transaction = await conn.BeginTransactionAsync();
             try
             {
-                // Update Corsa.runs with endOfRun and calculate timeOfRun
+                // Update corsa.runs with endOfRun and calculate timeOfRun
                 await using (var cmd = new NpgsqlCommand(
-                                 "UPDATE Corsa.runs SET endOfRun = @endOfRun, timeOfRun = @timeOfRun WHERE runID = @runId",
+                                 "UPDATE corsa.runs SET endOfRun = @endOfRun, timeOfRun = @timeOfRun WHERE runID = @runId",
                                  conn))
                 {
                     cmd.Parameters.AddWithValue("runId", dtoRunId);
@@ -119,9 +119,9 @@ public class RunRepository
                     await cmd.ExecuteNonQueryAsync();
                 }
 
-                // Insert last coordinates into Corsa.maps
+                // Insert last coordinates into corsa.maps
                 await using (var cmd = new NpgsqlCommand(
-                                 "INSERT INTO Corsa.maps (mapID, lat, lng, time) VALUES (@mapId, @lat, @lng, @time)",
+                                 "INSERT INTO corsa.maps (mapID, lat, lng, time) VALUES (@mapId, @lat, @lng, @time)",
                                  conn))
                 {
                     cmd.Parameters.AddWithValue("mapId", dtoRunId);
@@ -149,8 +149,8 @@ public class RunRepository
 
     private async Task<DateTime> GetStartTimeOfRun(NpgsqlConnection conn, string runId)
     {
-        // Query Corsa.runs table to get the startOfRun time
-        var queryString = "SELECT startOfRun FROM Corsa.runs WHERE runID = @runId";
+        // Query corsa.runs table to get the startOfRun time
+        var queryString = "SELECT startOfRun FROM corsa.runs WHERE runID = @runId";
         await using var cmd = new NpgsqlCommand(queryString, conn);
         cmd.Parameters.AddWithValue("runId", runId);
         var startTime = await cmd.ExecuteScalarAsync();
@@ -169,8 +169,8 @@ public class RunRepository
             await using var transaction = await conn.BeginTransactionAsync();
             try
             {
-                // Insert into Corsa.runs
-                await using (var cmd = new NpgsqlCommand("INSERT INTO Corsa.runs (runID, user_id, startOfRun, timeOfRun, distance) VALUES (@runId, @userId, @startOfRun, @timeOfRun, @distance) RETURNING runID", conn))
+                // Insert into corsa.runs
+                await using (var cmd = new NpgsqlCommand("INSERT INTO corsa.runs (runID, user_id, startOfRun, timeOfRun, distance) VALUES (@runId, @userId, @startOfRun, @timeOfRun, @distance) RETURNING runID", conn))
                 {
                     cmd.Parameters.AddWithValue("runId", runId);
                     cmd.Parameters.AddWithValue("userId", dtoUserId);
@@ -219,8 +219,8 @@ public class RunRepository
                     return null;
                 }
 
-                // Delete run from Corsa.runs
-                await using (var cmd = new NpgsqlCommand("DELETE FROM Corsa.runs WHERE runID = @runId RETURNING runID", conn))
+                // Delete run from corsa.runs
+                await using (var cmd = new NpgsqlCommand("DELETE FROM corsa.runs WHERE runID = @runId RETURNING runID", conn))
                 {
                     cmd.Parameters.AddWithValue("runId", dtoRunId);
                     deletedRunId = (string)await cmd.ExecuteScalarAsync();
@@ -247,7 +247,7 @@ public class RunRepository
     private async Task<bool> IsRunBelongsToUser(NpgsqlConnection conn, int userId, string runId)
     {
         // Check if the run belongs to the user
-        var queryString = "SELECT COUNT(*) FROM Corsa.runs WHERE runID = @runId AND user_id = @userId";
+        var queryString = "SELECT COUNT(*) FROM corsa.runs WHERE runID = @runId AND user_id = @userId";
         await using var cmd = new NpgsqlCommand(queryString, conn);
         cmd.Parameters.AddWithValue("runId", runId);
         cmd.Parameters.AddWithValue("userId", userId);
@@ -264,8 +264,8 @@ public class RunRepository
             await using var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
 
-            // Query all runs for the user from Corsa.runs
-            var queryString = "SELECT runID, startOfRun, endOfRun, timeOfRun, distance FROM Corsa.runs WHERE user_id = @userId";
+            // Query all runs for the user from corsa.runs
+            var queryString = "SELECT runID, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE user_id = @userId";
             await using var cmd = new NpgsqlCommand(queryString, conn);
             cmd.Parameters.AddWithValue("userId", dtoUserId);
 
@@ -295,6 +295,44 @@ public class RunRepository
         }
 
         return runs;
+    }
+
+    public async Task<List<ProgressInfo>> GetProgressOfRunsForUser(int dtoUserId)
+    {
+        var progressList = new List<ProgressInfo>();
+        try
+        {
+            var connString = Environment.GetEnvironmentVariable("DBConnectionString");
+            await using var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
+
+            // Query the database to retrieve progress info for all runs of the user
+            var queryString = "SELECT runID, timeOfRun, distance FROM corsa.runs WHERE user_id = @userId";
+            await using var cmd = new NpgsqlCommand(queryString, conn);
+            cmd.Parameters.AddWithValue("userId", dtoUserId);
+
+            // Execute the query and read the results
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var runId = reader["runID"].ToString();
+                var timeOfRun = reader["timeOfRun"].ToString();
+                var distance = Convert.ToDouble(reader["distance"]);
+
+                progressList.Add(new ProgressInfo
+                {
+                    RunId = runId,
+                    TimeOfRun = timeOfRun,
+                    Distance = distance
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error occurred: " + ex.Message);
+        }
+
+        return progressList;
     }
 
 }

@@ -1,21 +1,21 @@
-DROP TABLE IF EXISTS Corsa.maps;
-DROP TABLE IF EXISTS Corsa.runs;
-DROP TABLE IF EXISTS Corsa.password_hash;
-DROP TABLE IF EXISTS Corsa.users;
+DROP TABLE IF EXISTS corsa.maps;
+DROP TABLE IF EXISTS corsa.runs;
+DROP TABLE IF EXISTS corsa.password_hash;
+DROP TABLE IF EXISTS corsa.users;
 
 DROP SCHEMA IF EXISTS Corsa;
 
 CREATE SCHEMA Corsa;
 
 
-create table Corsa.users
+create table corsa.users
 (
     id       SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     email    VARCHAR(50) NOT NULL UNIQUE
 );
 
-create table Corsa.password_hash
+create table corsa.password_hash
 (
     user_id   integer,
     hash      VARCHAR(350) NOT NULL,
@@ -24,7 +24,7 @@ create table Corsa.password_hash
     FOREIGN KEY (user_id) REFERENCES Corsa.users (id)
 );
 
-CREATE TABLE Corsa.runs
+CREATE TABLE corsa.runs
 (
     runID      SERIAL PRIMARY KEY,
     user_id    integer   NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE Corsa.runs
     FOREIGN KEY (user_id) REFERENCES Corsa.users (id)
 );
 
-CREATE TABLE Corsa.maps
+CREATE TABLE corsa.maps
 (
     mapID SERIAL    NOT NULL,
     lat   float     NOT NULL,
@@ -45,10 +45,10 @@ CREATE TABLE Corsa.maps
 );
 
 SELECT *
-FROM Corsa.users;
+FROM corsa.users;
 SELECT *
-FROM Corsa.password_hash;
+FROM corsa.password_hash;
 SELECT *
-FROM Corsa.runs;
+FROM corsa.runs;
 SELECT *
-FROM Corsa.maps;
+FROM corsa.maps;
