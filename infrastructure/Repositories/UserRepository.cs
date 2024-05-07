@@ -1,4 +1,5 @@
 using Backend.infrastructure.dataModels;
+using Dapper;
 using Npgsql;
 
 namespace Backend.infrastructure.Repositories;
@@ -16,19 +17,18 @@ public class UserRepository
         _dataSource = dataSource;
     }
 
-    public User Create(string username, int tlfnumber, string email)
+    public User Create(string username, string email)
     {
         const string sql = $@"
-INSERT INTO Taxapp.users (username, tlfnumber, email)
-VALUES (@username, @tlfnumber, @email)
+INSERT INTO corsa.users (username, email)
+VALUES (@username, @email)
 RETURNING
     id as {nameof(User.id)},
     username as {nameof(User.username)},
-    tlfnumber as {nameof(User.tlfnumber)},
     email as {nameof(User.email)};
 ";
         using var connection = _dataSource.OpenConnection();
-        return connection.QueryFirst<User>(sql, new { username, tlfnumber, email });
+        return connection.QueryFirst<User>(sql, new { username, email });
     }
 
     /**
@@ -40,9 +40,8 @@ RETURNING
 SELECT
     id as {nameof(User.id)},
     username as {nameof(User.username)},
-    tlfnumber as {nameof(User.tlfnumber)},
     email as {nameof(User.email)}
-FROM taxapp.users
+FROM corsa.users
 WHERE id = @id;
 ";
         using var connection = _dataSource.OpenConnection();
@@ -55,9 +54,8 @@ WHERE id = @id;
 SELECT
     id as {nameof(User.id)},
     username as {nameof(User.username)},
-    tlfnumber as {nameof(User.tlfnumber)}
     email as {nameof(User.email)}
-FROM taxapp.users
+FROM corsa.users
 ";
         using (var conn = _dataSource.OpenConnection())
         {
