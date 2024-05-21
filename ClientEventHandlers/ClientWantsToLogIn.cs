@@ -29,7 +29,7 @@ public class ClientWantsToLogIn : BaseEventHandler<ClientWantsToLogInDto>
         if (user == null)
         {
             // Authentication failed
-            socket.Send(JsonSerializer.Serialize(new ResponseDto
+            await socket.Send(JsonSerializer.Serialize(new ResponseDto
             {
                 MessageToClient = "Authentication failed",
                 ResponseData = null
@@ -41,7 +41,7 @@ public class ClientWantsToLogIn : BaseEventHandler<ClientWantsToLogInDto>
         var token = _jwtService.IssueToken(SessionData.FromUser(user));
 
         // Send the token to the client
-        socket.Send(JsonSerializer.Serialize(new ResponseDto
+        await socket.Send(JsonSerializer.Serialize(new ResponseDto
         {
             MessageToClient = "Successfully authenticated",
             ResponseData = new { token }

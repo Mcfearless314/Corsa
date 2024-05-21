@@ -1,4 +1,5 @@
-﻿using Backend.service;
+﻿using System.Text.Json;
+using Backend.service;
 using Backend.infrastructure.dataModels;
 using Fleck;
 using lib;
@@ -22,5 +23,6 @@ public class ClientWantsToSeeAProgressOfAllRuns : BaseEventHandler<ClientWantsTo
     public override async Task Handle(ClientWantsToSeeAProgressOfAllRunsDto dto, IWebSocketConnection socket)
     {
         List<ProgressInfo> listOfAllRuns = await _runService.GetProgressOfRunsForUser(dto.UserId);
+        await socket.Send(JsonSerializer.Serialize(listOfAllRuns));
     }
 }
