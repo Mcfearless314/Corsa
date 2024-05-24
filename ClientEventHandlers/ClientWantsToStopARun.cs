@@ -12,7 +12,7 @@ public class ClientWantsToStopARunDto : BaseDto
 
     public double EndingLng { get; set; }
 
-    public double RunId { get; set; }
+    public string RunId { get; set; }
 }
 
 public class ClientWantsToStopARun : BaseEventHandler<ClientWantsToStopARunDto>
