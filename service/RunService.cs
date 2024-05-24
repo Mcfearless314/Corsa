@@ -15,8 +15,9 @@ public class RunService
     public async Task<string> LogRunToDb(int dtoUserId, double dtoStartingLat, double dtoStartingLng,
         string? dtoRunStartTime)
     {
-        string runId = $"{dtoUserId}_{dtoRunStartTime}";
-        return await _runRepository.LogRunToDb(runId, dtoStartingLat, dtoStartingLng, dtoRunStartTime);
+        // Remove the '/' and ':' characters from the formattedDateTime string
+        string runId = $"{dtoUserId}_{dtoRunStartTime.Replace("/", "").Replace(":", "").Replace(" ", "")}";
+        return await _runRepository.LogRunToDb(dtoUserId,runId, dtoStartingLat, dtoStartingLng, dtoRunStartTime);
     }
 
     public async Task LogCoordinatesToDb(string dtoRunId, double dtoLat, double dtoLng, DateTime dtoLoggingTime)

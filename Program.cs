@@ -1,6 +1,5 @@
-using System.Net.Sockets;
 using System.Reflection;
-using System.Text.Json;
+using System.Text.Json.Serialization;
 using Backend.infrastructure;
 using Backend.infrastructure.Repositories;
 using Backend.service;
@@ -32,11 +31,15 @@ public static class Startup
         builder.Services.AddSingleton<RunRepository>();
         builder.Services.AddSingleton<UserRepository>();
         builder.Services.AddSingleton<PasswordHashRepository>();
-        builder.Services.AddSingleton<JwtOptions>();
         builder.Services.AddSingleton<Argon2idPasswordHashAlgorithm>();
         builder.Services.AddSingleton<RunService>();
         builder.Services.AddNpgsqlDataSource(DatabaseConnector.ProperlyFormattedConnectionString,
             dataSourceBuilder => dataSourceBuilder.EnableParameterLogging());
+        
+        builder.Services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        });
 
         var clientEventHandlers = builder.FindAndInjectClientEventHandlers(Assembly.GetExecutingAssembly());
 

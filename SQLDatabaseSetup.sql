@@ -26,7 +26,7 @@ create table corsa.password_hash
 
 CREATE TABLE corsa.runs
 (
-    runID      SERIAL PRIMARY KEY,
+    runID      VARCHAR(20) PRIMARY KEY,
     user_id    integer   NOT NULL,
     startOfRun timestamp NOT NULL,
     endOfRun   timestamp,
@@ -37,10 +37,10 @@ CREATE TABLE corsa.runs
 
 CREATE TABLE corsa.maps
 (
-    mapID SERIAL    NOT NULL,
-    lat   float     NOT NULL,
-    lng   float     NOT NULL,
-    time  timestamp NOT NULL,
+    mapID VARCHAR(20) NOT NULL,
+    lat   float       NOT NULL,
+    lng   float       NOT NULL,
+    time  timestamp   NOT NULL,
     FOREIGN KEY (mapID) REFERENCES Corsa.runs (runID)
 );
 

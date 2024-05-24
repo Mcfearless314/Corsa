@@ -24,11 +24,11 @@ public class AccountService
      * to see if it is the same one in the DB.
      * Returns the user, so the User-info can be used in fx frontend
      */
-    public User? Authenticate(string email, string password)
+    public User? Authenticate(string username, string password)
     {
         try
         {
-            var passwordHash = _passwordHashRepository.GetByEmail(email); //Call Infrastructure to get the PasswordHash from the Email
+            var passwordHash = _passwordHashRepository.GetByUsername(username); //Call Infrastructure to get the PasswordHash from the Email
             var hashAlgorithm = PasswordHashAlgorithm.Create(passwordHash.Algorithm); //Creates the hashing algorithm
             //Using the algorithm we just created, we try to validate it.
             //It takes in the password and salt, hashes it, and it takes the hashed from the db, and returns, if they match or not.

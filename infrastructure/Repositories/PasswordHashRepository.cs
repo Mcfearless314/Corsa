@@ -37,6 +37,22 @@ public class PasswordHashRepository
         return connection.QuerySingle<PasswordHash>(sql, new { email });
     }
 
+    public PasswordHash GetByUsername(string username)
+    {
+        const string sql = $@"
+            SELECT 
+                user_id as {nameof(PasswordHash.UserId)},
+                hash as {nameof(PasswordHash.Hash)},
+                salt as {nameof(PasswordHash.Salt)},
+                algorithm as {nameof(PasswordHash.Algorithm)}
+            FROM corsa.password_hash
+            JOIN corsa.users ON corsa.password_hash.user_id = users.id
+            WHERE username = @username;
+        ";
+        using var connection = _dataSource.OpenConnection();
+        return connection.QuerySingle<PasswordHash>(sql, new { username });
+    }
+
     public void Create(int userId, string hash, string salt, string algorithm)
     {
         const string sql = $@"

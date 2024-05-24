@@ -1,4 +1,5 @@
-﻿using Backend.infrastructure.dataModels;
+﻿using System.Globalization;
+using Backend.infrastructure.dataModels;
 using Npgsql;
 
 namespace Backend.infrastructure.Repositories;
@@ -12,7 +13,7 @@ public class RunRepository
         _dataSource = datasource;
     }
 
-    public async Task<string> LogRunToDb(string runId, double dtoStartingLat, double dtoStartingLng,
+    public async Task<string> LogRunToDb(int userId, string runId, double dtoStartingLat, double dtoStartingLng,
         string? formattedDateTime)
     {
         string insertedRunId = string.Empty;
@@ -23,13 +24,17 @@ public class RunRepository
             await using var transaction = await connection.BeginTransactionAsync();
             try
             {
+                // Convert formattedDateTime to DateTime
+                DateTime dateTime = DateTime.ParseExact(formattedDateTime!, "dd/MM/yy HH:mm", CultureInfo.InvariantCulture);
+                
                 // Insert into corsa.runs
                 await using (var cmd = new NpgsqlCommand(
-                                 "INSERT INTO corsa.runs (runID, startOfRun) VALUES (@runId, @startOfRun) RETURNING runID",
+                                 "INSERT INTO corsa.runs (user_id, runID, startOfRun) VALUES (@userId, @runId, @startOfRun) RETURNING runID",
                                  connection))
                 {
+                    cmd.Parameters.AddWithValue("userId", userId);
                     cmd.Parameters.AddWithValue("runId", runId);
-                    cmd.Parameters.AddWithValue("startOfRun", formattedDateTime);
+                    cmd.Parameters.AddWithValue("startOfRun", dateTime);
                     insertedRunId = (string)await cmd.ExecuteScalarAsync();
                 }
 
@@ -41,7 +46,7 @@ public class RunRepository
                     cmd.Parameters.AddWithValue("mapId", runId);
                     cmd.Parameters.AddWithValue("lat", dtoStartingLat);
                     cmd.Parameters.AddWithValue("lng", dtoStartingLng);
-                    cmd.Parameters.AddWithValue("time", formattedDateTime);
+                    cmd.Parameters.AddWithValue("time", dateTime);
                     await cmd.ExecuteNonQueryAsync();
                 }
 
