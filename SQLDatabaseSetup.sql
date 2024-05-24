@@ -21,7 +21,7 @@ create table corsa.password_hash
     hash      VARCHAR(350) NOT NULL,
     salt      VARCHAR(180) NOT NULL,
     algorithm VARCHAR(12)  NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Corsa.users (id)
+    FOREIGN KEY (user_id) REFERENCES Corsa.users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE corsa.runs
@@ -32,7 +32,7 @@ CREATE TABLE corsa.runs
     endOfRun   timestamp,
     timeOfRun  TIME,
     distance   float,
-    FOREIGN KEY (user_id) REFERENCES Corsa.users (id)
+    FOREIGN KEY (user_id) REFERENCES Corsa.users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE corsa.maps
@@ -41,7 +41,7 @@ CREATE TABLE corsa.maps
     lat   float       NOT NULL,
     lng   float       NOT NULL,
     time  timestamp   NOT NULL,
-    FOREIGN KEY (mapID) REFERENCES Corsa.runs (runID)
+    FOREIGN KEY (mapID) REFERENCES Corsa.runs (runID) ON DELETE CASCADE
 );
 
 SELECT *

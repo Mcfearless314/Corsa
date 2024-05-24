@@ -204,7 +204,6 @@ public class RunRepository
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
-            await connection.OpenAsync();
 
             await using var transaction = await connection.BeginTransactionAsync();
             try
