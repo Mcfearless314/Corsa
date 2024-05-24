@@ -8,6 +8,8 @@ using lib;
 
 namespace Backend;
 
+
+
 public static class Startup
 {
     public static void Main(string[] args)
@@ -18,14 +20,19 @@ public static class Startup
 
     public static void Statup(string[] args)
     {
+        
         var builder = WebApplication.CreateBuilder(args);
-
-
+        
         builder.Services.AddHttpClient();
+        builder.Services.AddJwtService();
+        builder.Services.AddSingleton<RunService>();
+        builder.Services.AddSingleton<AccountService>();
 
         var clientEventHandlers = builder.FindAndInjectClientEventHandlers(Assembly.GetExecutingAssembly());
 
         var app = builder.Build();
+        
+
 
         var server = new WebSocketServer("ws://0.0.0.0:8181");
 
