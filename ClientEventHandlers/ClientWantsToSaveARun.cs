@@ -6,7 +6,7 @@ namespace Backend.ClientEventHandlers;
 
 public class ClientWantsToSaveARunDto : BaseDto
 {
-    public DateTime RunDateTime { get; set; }
+    public string? RunDateTime { get; set; }
 
     public int UserId { get; set; }
 

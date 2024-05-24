@@ -1,4 +1,5 @@
-﻿using Backend.infrastructure.dataModels;
+﻿using System.Globalization;
+using Backend.infrastructure.dataModels;
 using Backend.infrastructure.Repositories;
 
 namespace Backend.service;
@@ -16,8 +17,10 @@ public class RunService
         string? dtoRunStartTime)
     {
         // Remove the '/' and ':' characters from the formattedDateTime string
-        string runId = $"{dtoUserId}_{dtoRunStartTime.Replace("/", "").Replace(":", "").Replace(" ", "")}";
-        return await _runRepository.LogRunToDb(dtoUserId,runId, dtoStartingLat, dtoStartingLng, dtoRunStartTime);
+        string runId = $"{dtoUserId}_{dtoRunStartTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
+        // Convert dtoRunStartTime to DateTime
+        DateTime dateTime = DateTime.ParseExact(dtoRunStartTime!, "dd/MM/yy HH:mm", CultureInfo.InvariantCulture);
+        return await _runRepository.LogRunToDb(dtoUserId,runId, dtoStartingLat, dtoStartingLng, dateTime);
     }
 
     public async Task LogCoordinatesToDb(string dtoRunId, double dtoLat, double dtoLng, DateTime dtoLoggingTime)
@@ -33,12 +36,15 @@ public class RunService
         await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, formattedEndingTime);
     }
 
-    public async Task<string> SaveRunToDb(int dtoUserId, DateTime dtoRunDateTime, string dtoRunTime,
+    public async Task<string> SaveRunToDb(int dtoUserId, string dtoRunDateTime, string dtoRunTime,
         double dtoRunDistance)
     {
-        string formattedRunDateTime = dtoRunDateTime.ToString();
-        string runId = $"{dtoUserId}_{formattedRunDateTime}";
-        return await _runRepository.SaveRunToDb(runId, dtoUserId, formattedRunDateTime, dtoRunTime, dtoRunDistance);
+        // Convert dtoRunStartTime to DateTime
+        DateTime dateTime = DateTime.ParseExact(dtoRunDateTime!, "dd/MM/yy HH:mm", CultureInfo.InvariantCulture);
+        // Remove the '/' and ':' characters from the formattedDateTime string
+        string runId = $"{dtoUserId}_{dtoRunDateTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
+        TimeSpan runTime = TimeSpan.Parse(dtoRunTime);
+        return await _runRepository.SaveRunToDb(runId, dtoUserId, dateTime, runTime, dtoRunDistance);
     }
 
     public async Task<string> DeleteRunFromDb(int dtoUserId, string dtoRunId)

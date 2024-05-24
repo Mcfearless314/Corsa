@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Backend.infrastructure.dataModels;
+﻿using Backend.infrastructure.dataModels;
 using Npgsql;
 
 namespace Backend.infrastructure.Repositories;
@@ -14,7 +13,7 @@ public class RunRepository
     }
 
     public async Task<string> LogRunToDb(int userId, string runId, double dtoStartingLat, double dtoStartingLng,
-        string? formattedDateTime)
+        DateTime? dateTime)
     {
         string insertedRunId = string.Empty;
         try
@@ -24,9 +23,6 @@ public class RunRepository
             await using var transaction = await connection.BeginTransactionAsync();
             try
             {
-                // Convert formattedDateTime to DateTime
-                DateTime dateTime = DateTime.ParseExact(formattedDateTime!, "dd/MM/yy HH:mm", CultureInfo.InvariantCulture);
-                
                 // Insert into corsa.runs
                 await using (var cmd = new NpgsqlCommand(
                                  "INSERT INTO corsa.runs (user_id, runID, startOfRun) VALUES (@userId, @runId, @startOfRun) RETURNING runID",
@@ -34,7 +30,7 @@ public class RunRepository
                 {
                     cmd.Parameters.AddWithValue("userId", userId);
                     cmd.Parameters.AddWithValue("runId", runId);
-                    cmd.Parameters.AddWithValue("startOfRun", dateTime);
+                    cmd.Parameters.AddWithValue("startOfRun", dateTime!);
                     insertedRunId = (string)await cmd.ExecuteScalarAsync();
                 }
 
@@ -97,7 +93,6 @@ public class RunRepository
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
-            await connection.OpenAsync();
 
             await using var transaction = await connection.BeginTransactionAsync();
             try
@@ -157,14 +152,13 @@ public class RunRepository
         return Convert.ToDateTime(startTime);
     }
 
-    public async Task<string> SaveRunToDb(string runId, double dtoUserId, string formattedRunDateTime, string formattedRunTime, double dtoRunDistance)
+    public async Task<string> SaveRunToDb(string runId, double dtoUserId, DateTime RunDateTime, TimeSpan formattedRunTime, double dtoRunDistance)
     {
         string insertedRunId = string.Empty;
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
-            await connection.OpenAsync();
-
+ 
             await using var transaction = await connection.BeginTransactionAsync();
             try
             {
@@ -173,7 +167,7 @@ public class RunRepository
                 {
                     cmd.Parameters.AddWithValue("runId", runId);
                     cmd.Parameters.AddWithValue("userId", dtoUserId);
-                    cmd.Parameters.AddWithValue("startOfRun", formattedRunDateTime);
+                    cmd.Parameters.AddWithValue("startOfRun", RunDateTime);
                     cmd.Parameters.AddWithValue("timeOfRun", formattedRunTime);
                     cmd.Parameters.AddWithValue("distance", dtoRunDistance);
 
@@ -258,7 +252,6 @@ public class RunRepository
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
-            await connection.OpenAsync();
 
             // Query all runs for the user from corsa.runs
             var queryString = "SELECT runID, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE user_id = @userId";
@@ -299,7 +292,6 @@ public class RunRepository
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
-            await connection.OpenAsync();
 
             // Query the database to retrieve progress info for all runs of the user
             var queryString = "SELECT runID, timeOfRun, distance FROM corsa.runs WHERE user_id = @userId";
