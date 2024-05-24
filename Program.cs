@@ -1,6 +1,8 @@
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text.Json;
+using Backend.infrastructure;
+using Backend.infrastructure.Repositories;
 using Backend.service;
 using Fleck;
 using lib;
@@ -27,6 +29,14 @@ public static class Startup
         builder.Services.AddJwtService();
         builder.Services.AddSingleton<RunService>();
         builder.Services.AddSingleton<AccountService>();
+        builder.Services.AddSingleton<RunRepository>();
+        builder.Services.AddSingleton<UserRepository>();
+        builder.Services.AddSingleton<PasswordHashRepository>();
+        builder.Services.AddSingleton<JwtOptions>();
+        builder.Services.AddSingleton<Argon2idPasswordHashAlgorithm>();
+        builder.Services.AddSingleton<RunService>();
+        builder.Services.AddNpgsqlDataSource(DatabaseConnector.ProperlyFormattedConnectionString,
+            dataSourceBuilder => dataSourceBuilder.EnableParameterLogging());
 
         var clientEventHandlers = builder.FindAndInjectClientEventHandlers(Assembly.GetExecutingAssembly());
 

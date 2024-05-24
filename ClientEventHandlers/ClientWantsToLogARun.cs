@@ -8,7 +8,7 @@ namespace Backend.ClientEventHandlers;
 
 public class ClientWantsToLogARunDto : BaseDto
 {
-    public DateTime RunStartTime { get; set; }
+    public string? RunStartTime { get; set; }
 
     public double StartingLat { get; set; }
 

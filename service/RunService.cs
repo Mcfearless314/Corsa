@@ -13,11 +13,10 @@ public class RunService
     }
 
     public async Task<string> LogRunToDb(int dtoUserId, double dtoStartingLat, double dtoStartingLng,
-        DateTime? dtoRunStartTime)
+        string? dtoRunStartTime)
     {
-        string formattedDateTime = dtoRunStartTime.ToString();
-        string runId = $"{dtoUserId}_{formattedDateTime}";
-        return await _runRepository.LogRunToDb(runId, dtoStartingLat, dtoStartingLng, formattedDateTime);
+        string runId = $"{dtoUserId}_{dtoRunStartTime}";
+        return await _runRepository.LogRunToDb(runId, dtoStartingLat, dtoStartingLng, dtoRunStartTime);
     }
 
     public async Task LogCoordinatesToDb(string dtoRunId, double dtoLat, double dtoLng, DateTime dtoLoggingTime)
