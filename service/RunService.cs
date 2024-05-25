@@ -61,4 +61,9 @@ public class RunService
     {
         return await _runRepository.GetProgressOfRunsForUser(dtoUserId);
     }
+
+    public async Task<RunInfoWithMap> GetFullInfoOfRun(int dtoUserId, string dtoRunId)
+    {   
+        return await _runRepository.GetFullInfoOfRun(dtoUserId, dtoRunId);
+    }
 }

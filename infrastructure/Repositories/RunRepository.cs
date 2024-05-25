@@ -373,4 +373,61 @@ public class RunRepository
 
         return progressList;
     }
+
+    public async Task<RunInfoWithMap> GetFullInfoOfRun(int dtoUserId, string dtoRunId)
+    {
+        RunInfoWithMap runInfo = null;
+        try
+        {
+            await using var connection = await _dataSource.OpenConnectionAsync();
+
+            // Query the database to retrieve the run info
+            await using (var cmd = new NpgsqlCommand(
+                             "SELECT runID, user_id, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE runID = @runId AND user_id = @userId",
+                             connection))
+            {
+                cmd.Parameters.AddWithValue("runId", dtoRunId);
+                cmd.Parameters.AddWithValue("userId", dtoUserId);
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    runInfo = new RunInfoWithMap
+                    {
+                        RunId = reader.GetString(0),
+                        StartOfRun = reader.GetDateTime(1),
+                        EndOfRun = reader.GetDateTime(2),
+                        TimeOfRun = reader.GetString(3),
+                        Distance = reader.GetDouble(4),
+                        Coordinates = new List<Coordinates>()
+                    };
+                }
+            }
+
+            // Query the database to retrieve the list of coordinates
+            await using (var cmd = new NpgsqlCommand(
+                             "SELECT lat, lng, time FROM corsa.maps WHERE mapID = @mapId ORDER BY time",
+                             connection))
+            {
+                cmd.Parameters.AddWithValue("mapId", dtoRunId);
+
+                await using var reader = await cmd.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    runInfo.Coordinates.Add(new Coordinates
+                    {
+                        Latitude = reader.GetDouble(0),
+                        Longitude = reader.GetDouble(1),
+                        TimeStamp = reader.GetDateTime(2)
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error occurred: " + ex.Message);
+        }
+
+        return runInfo;
+    }
 }
