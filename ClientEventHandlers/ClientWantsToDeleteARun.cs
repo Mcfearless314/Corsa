@@ -27,7 +27,7 @@ public class ClientWantsToDeleteARun : BaseEventHandler<ClientWantsToDeleteARunD
         
         var runDeleted = await _runService.DeleteRunFromDb(dto.UserId, dto.RunId);
 
-        var response = new ServerConfirmsDeletionOfRun()
+        var response = new ServerConfirmsDeletionOfRun
         {
             RunDeleted = "Run successfully deleted: " + runDeleted
         };

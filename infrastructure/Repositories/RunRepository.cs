@@ -90,7 +90,7 @@ public class RunRepository
     public async Task<RunInfoWithMap> LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
         string formattedEndingTime)
     {
-        RunInfo runInfo;
+        RunInfoWithMap runInfo = null;
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
@@ -131,6 +131,47 @@ public class RunRepository
                 await transaction.CommitAsync();
                 Console.WriteLine("Ending of run logged successfully.");
                 
+                // Query the database to retrieve the run info
+                await using (var cmd = new NpgsqlCommand(
+                                 "SELECT runID, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE runID = @runId",
+                                 connection))
+                {
+                    cmd.Parameters.AddWithValue("runId", dtoRunId);
+
+                    await using var reader = await cmd.ExecuteReaderAsync();
+                    if (await reader.ReadAsync())
+                    {
+                        runInfo = new RunInfoWithMap
+                        {
+                            RunId = reader.GetString(0),
+                            StartOfRun = reader.GetDateTime(1),
+                            EndOfRun = reader.GetDateTime(2),
+                            TimeOfRun = reader.GetString(3),
+                            Distance = reader.GetDouble(4),
+                            Coordinates = new List<Coordinates>()
+                        };
+                    }
+                }
+
+                // Query the database to retrieve the list of coordinates
+                await using (var cmd = new NpgsqlCommand(
+                                 "SELECT lat, lng FROM corsa.maps WHERE mapID = @mapId ORDER BY time",
+                                 connection))
+                {
+                    cmd.Parameters.AddWithValue("mapId", dtoRunId);
+
+                    await using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        runInfo.Coordinates.Add(new Coordinates
+                        {
+                            Latitude = reader.GetDouble(0),
+                            Longitude = reader.GetDouble(1),
+                            TimeStamp = reader.GetDateTime(2)
+                        });
+                    }
+                }
+                
             }
             catch (Exception ex)
             {
@@ -142,7 +183,8 @@ public class RunRepository
         {
             Console.WriteLine("Error occurred: " + ex.Message);
         }
-            
+
+        return runInfo;
     }
 
     private async Task<DateTime> GetStartTimeOfRun(NpgsqlConnection conn, string runId)

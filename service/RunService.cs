@@ -29,11 +29,11 @@ public class RunService
         await _runRepository.LogCoordinatesToDb(dtoRunId, dtoLat, dtoLng, formattedLoggingTime);
     }
 
-    public async Task LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
+    public async Task<RunInfoWithMap> LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
         DateTime dtoRunEndTime)
     {
         string formattedEndingTime = dtoRunEndTime.ToString();
-        await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, formattedEndingTime);
+        return await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, formattedEndingTime);
     }
 
     public async Task<string> SaveRunToDb(int dtoUserId, string dtoRunDateTime, string dtoRunTime,

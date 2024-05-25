@@ -1,4 +1,6 @@
-﻿using Backend.service;
+﻿using System.Text.Json;
+using Backend.infrastructure.dataModels;
+using Backend.service;
 using Fleck;
 using lib;
 
@@ -26,13 +28,22 @@ public class ClientWantsToStopARun : BaseEventHandler<ClientWantsToStopARunDto>
 
     public override async Task Handle(ClientWantsToStopARunDto dto, IWebSocketConnection socket)
     {
-         await _runService.LogEndingOfRunToDb(dto.RunId, dto.EndingLat, dto.EndingLng, dto.RunEndTime);
+         var RunCompleted = await _runService.LogEndingOfRunToDb(dto.RunId, dto.EndingLat, dto.EndingLng, dto.RunEndTime);
+         var response = new ServerSendsBackRunWithMap
+         {
+             Message = "Run successfully stopped: " + RunCompleted,
+             FullRunInfo = RunCompleted
+         };
+         
+            await socket.Send(JsonSerializer.Serialize(response));
+             
+             
 
     }
 }
 
-public class ServerConfirmsRunStopped : BaseDto
+public class ServerSendsBackRunWithMap : BaseDto
 {
     public string Message { get; set; }
-    public string runId { get; set; }
+    public RunInfoWithMap FullRunInfo { get; set; }
 }
