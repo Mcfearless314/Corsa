@@ -17,18 +17,16 @@ public class UserRepository
         _dataSource = dataSource;
     }
 
-    public User Create(string username, string email)
+    public int Create(string username, string email)
     {
         const string sql = $@"
 INSERT INTO corsa.users (username, email)
 VALUES (@username, @email)
 RETURNING
-    id as {nameof(User.id)},
-    username as {nameof(User.username)},
-    email as {nameof(User.email)};
+    id as {nameof(User.id)}
 ";
         using var connection = _dataSource.OpenConnection();
-        return connection.QueryFirst<User>(sql, new { username, email });
+        return connection.QueryFirst<int>(sql, new { username, email });
     }
 
     /**

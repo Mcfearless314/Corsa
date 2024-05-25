@@ -30,3 +30,9 @@ public class ClientWantsToStopARun : BaseEventHandler<ClientWantsToStopARunDto>
 
     }
 }
+
+public class ServerConfirmsRunStopped : BaseDto
+{
+    public string Message { get; set; }
+    public string runId { get; set; }
+}

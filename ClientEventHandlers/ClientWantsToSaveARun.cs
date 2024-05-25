@@ -1,4 +1,5 @@
-﻿using Backend.service;
+﻿using System.Text.Json;
+using Backend.service;
 using Fleck;
 using lib;
 
@@ -26,7 +27,18 @@ public class ClientWantsToSaveARun : BaseEventHandler<ClientWantsToSaveARunDto>
     }
     public override async Task Handle(ClientWantsToSaveARunDto dto, IWebSocketConnection socket)
     {
-        var runSaved = await _runService.SaveRunToDb(dto.UserId, dto.RunDateTime, dto.RunTime, dto.RunDistance);
-        await socket.Send(runSaved);
+        var runId = await _runService.SaveRunToDb(dto.UserId, dto.RunDateTime, dto.RunTime, dto.RunDistance);
+        
+        var response = new ServerConfirmsRunSaved()
+        {
+            RunSaved = "Run successfully saved: " + runId
+        };
+        
+        await socket.Send(JsonSerializer.Serialize(response));
     }
+}
+
+public class ServerConfirmsRunSaved : BaseDto
+{
+    public string RunSaved { get; set; }
 }

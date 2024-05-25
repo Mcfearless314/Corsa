@@ -23,6 +23,17 @@ public class ClientWantsToSeeAProgressOfAllRuns : BaseEventHandler<ClientWantsTo
     public override async Task Handle(ClientWantsToSeeAProgressOfAllRunsDto dto, IWebSocketConnection socket)
     {
         List<ProgressInfo> listOfAllRuns = await _runService.GetProgressOfRunsForUser(dto.UserId);
-        await socket.Send(JsonSerializer.Serialize(listOfAllRuns));
+        
+        var response = new ServerSendsBackAllProgress()
+        {
+            AllProgress = listOfAllRuns
+        };
+        
+        await socket.Send(JsonSerializer.Serialize(response));
     }
+}
+
+public class ServerSendsBackAllProgress : BaseDto
+{
+    public List<ProgressInfo> AllProgress { get; set; }
 }

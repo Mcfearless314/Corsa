@@ -8,3 +8,8 @@ public class RunInfo
     public string TimeOfRun { get; set; }
     public double Distance { get; set; }
 }
+
+public class RunInfoWithMap : RunInfo
+{
+    public List<Coordinates> Coordinates { get; set; }
+}

@@ -23,6 +23,17 @@ public class ClientWantsToSeeAllSavedRuns : BaseEventHandler<ClientWantsToSeeAll
     public override async Task Handle(ClientWantsToSeeAllSavedRunsDto dto, IWebSocketConnection socket)
     {
         List<RunInfo> listOfAllRuns = await _runService.GetAllRunsForUser(dto.UserId);
-        await socket.Send(JsonSerializer.Serialize(listOfAllRuns));
+        
+        var response    = new ServerSendsBackAllSavedRuns()
+        {
+            AllRuns = listOfAllRuns
+        };
+        
+        await socket.Send(JsonSerializer.Serialize(response));
     }
+}
+
+public class ServerSendsBackAllSavedRuns : BaseDto
+{
+    public List<RunInfo> AllRuns { get; set; }
 }

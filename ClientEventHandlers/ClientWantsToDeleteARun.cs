@@ -1,4 +1,5 @@
-﻿using Backend.service;
+﻿using System.Text.Json;
+using Backend.service;
 using Fleck;
 using lib;
 
@@ -22,7 +23,20 @@ public class ClientWantsToDeleteARun : BaseEventHandler<ClientWantsToDeleteARunD
 
     public override async Task Handle(ClientWantsToDeleteARunDto dto, IWebSocketConnection socket)
     {
+        
+        
         var runDeleted = await _runService.DeleteRunFromDb(dto.UserId, dto.RunId);
-        await socket.Send(runDeleted);
+
+        var response = new ServerConfirmsDeletionOfRun()
+        {
+            RunDeleted = "Run successfully deleted: " + runDeleted
+        };
+        await socket.Send(JsonSerializer.Serialize(response));
     }
+    
+}
+
+public class ServerConfirmsDeletionOfRun : BaseDto
+{
+    public string RunDeleted { get; set; }
 }

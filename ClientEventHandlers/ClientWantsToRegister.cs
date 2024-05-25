@@ -21,10 +21,34 @@ public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
         _accountService = accountService;
     }
 
-    public override Task Handle(ClientWantsToRegisterDto dto, IWebSocketConnection socket)
+    public override async Task Handle(ClientWantsToRegisterDto dto, IWebSocketConnection socket)
     {
-        var user = _accountService.Register(dto.Username, dto.Email, dto.Password);
-        socket.Send(JsonSerializer.Serialize(user));
-        return Task.CompletedTask;
+        var userId = _accountService.Register(dto.Username, dto.Email, dto.Password);
+        if (userId <= 0)
+        {
+            // Registration failed
+            var response = new ServerConfirmsRegistration()
+            {
+                Message = "Registration failed"
+            };
+            await socket.Send(JsonSerializer.Serialize(response));
+        }
+        else
+        {
+            // Registration successful
+            var response = new ServerConfirmsRegistration()
+            {
+                Message = "Registration successful",
+                UserId = userId
+            };
+
+            await socket.Send(JsonSerializer.Serialize(response));
+        }
     }
+}
+
+public class ServerConfirmsRegistration : BaseDto
+{
+    public string Message { get; set; }
+    public int UserId { get; set; }
 }

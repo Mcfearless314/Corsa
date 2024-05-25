@@ -48,14 +48,14 @@ public class AccountService
      * A request is sent, and the information is stored
      * It creates the hashAlgorithm, salt and thereby the hashed password
      */
-    public User Register(string username, string email, string password)
+    public int Register(string username, string email, string password)
     {
         var hashAlgorithm = PasswordHashAlgorithm.Create();
         var salt = hashAlgorithm.GenerateSalt();
         var hash = hashAlgorithm.HashPassword(password, salt);
-        var user = _userRepository.Create(username, email);
-        _passwordHashRepository.Create(user.id, hash, salt, hashAlgorithm.GetName());
-        return user;
+        var userId = _userRepository.Create(username, email);
+        _passwordHashRepository.Create(userId, hash, salt, hashAlgorithm.GetName());
+        return userId;
     }
 
     public object Get(SessionData data)

@@ -87,9 +87,10 @@ public class RunRepository
         }
     }
 
-    public async Task LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
+    public async Task<RunInfoWithMap> LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
         string formattedEndingTime)
     {
+        RunInfo runInfo;
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
@@ -129,6 +130,7 @@ public class RunRepository
 
                 await transaction.CommitAsync();
                 Console.WriteLine("Ending of run logged successfully.");
+                
             }
             catch (Exception ex)
             {
@@ -140,6 +142,7 @@ public class RunRepository
         {
             Console.WriteLine("Error occurred: " + ex.Message);
         }
+            
     }
 
     private async Task<DateTime> GetStartTimeOfRun(NpgsqlConnection conn, string runId)
@@ -152,18 +155,21 @@ public class RunRepository
         return Convert.ToDateTime(startTime);
     }
 
-    public async Task<string> SaveRunToDb(string runId, double dtoUserId, DateTime RunDateTime, TimeSpan formattedRunTime, double dtoRunDistance)
+    public async Task<string> SaveRunToDb(string runId, double dtoUserId, DateTime RunDateTime,
+        TimeSpan formattedRunTime, double dtoRunDistance)
     {
         string insertedRunId = string.Empty;
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();
- 
+
             await using var transaction = await connection.BeginTransactionAsync();
             try
             {
                 // Insert into corsa.runs
-                await using (var cmd = new NpgsqlCommand("INSERT INTO corsa.runs (runID, user_id, startOfRun, timeOfRun, distance) VALUES (@runId, @userId, @startOfRun, @timeOfRun, @distance) RETURNING runID", connection))
+                await using (var cmd = new NpgsqlCommand(
+                                 "INSERT INTO corsa.runs (runID, user_id, startOfRun, timeOfRun, distance) VALUES (@runId, @userId, @startOfRun, @timeOfRun, @distance) RETURNING runID",
+                                 connection))
                 {
                     cmd.Parameters.AddWithValue("runId", runId);
                     cmd.Parameters.AddWithValue("userId", dtoUserId);
@@ -211,7 +217,8 @@ public class RunRepository
                 }
 
                 // Delete run from corsa.runs
-                await using (var cmd = new NpgsqlCommand("DELETE FROM corsa.runs WHERE runID = @runId RETURNING runID", connection))
+                await using (var cmd = new NpgsqlCommand("DELETE FROM corsa.runs WHERE runID = @runId RETURNING runID",
+                                 connection))
                 {
                     cmd.Parameters.AddWithValue("runId", dtoRunId);
                     deletedRunId = (string)await cmd.ExecuteScalarAsync();
@@ -254,7 +261,8 @@ public class RunRepository
             await using var connection = await _dataSource.OpenConnectionAsync();
 
             // Query all runs for the user from corsa.runs
-            var queryString = "SELECT runID, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE user_id = @userId";
+            var queryString =
+                "SELECT runID, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE user_id = @userId";
             await using var cmd = new NpgsqlCommand(queryString, connection);
             cmd.Parameters.AddWithValue("userId", dtoUserId);
 
@@ -264,7 +272,9 @@ public class RunRepository
             {
                 var runId = reader["runID"].ToString();
                 var startOfRun = reader.GetDateTime(reader.GetOrdinal("startOfRun"));
-                var endOfRun = reader.IsDBNull(reader.GetOrdinal("endOfRun")) ? null : (DateTime?)reader.GetDateTime(reader.GetOrdinal("endOfRun"));
+                var endOfRun = reader.IsDBNull(reader.GetOrdinal("endOfRun"))
+                    ? null
+                    : (DateTime?)reader.GetDateTime(reader.GetOrdinal("endOfRun"));
                 var timeOfRun = reader["timeOfRun"].ToString();
                 var distance = Convert.ToDouble(reader["distance"]);
 
@@ -321,5 +331,4 @@ public class RunRepository
 
         return progressList;
     }
-
 }

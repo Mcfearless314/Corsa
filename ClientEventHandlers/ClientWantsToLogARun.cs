@@ -1,4 +1,5 @@
-﻿using Backend.infrastructure;
+﻿using System.Text.Json;
+using Backend.infrastructure;
 using Backend.service;
 using Fleck;
 using lib;
@@ -29,7 +30,17 @@ public class ClientWantsToLogARun : BaseEventHandler<ClientWantsToLogARunDto>
     public override async Task Handle(ClientWantsToLogARunDto dto, IWebSocketConnection socket)
     {
         var runStarted = await _runService.LogRunToDb(dto.UserId, dto.StartingLat, dto.StartingLng, dto.RunStartTime);
-        await socket.Send(runStarted);
+        
+        var response = new ServerSendsBackRunId()
+        {
+            RunId =  runStarted
+        };
+        await socket.Send(JsonSerializer.Serialize(response));
 
     }
+}
+
+public class ServerSendsBackRunId : BaseDto
+{
+    public string RunId { get; set; }
 }
