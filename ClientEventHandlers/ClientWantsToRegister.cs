@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.exceptions;
 using Backend.service;
 using Fleck;
 using lib;
@@ -24,6 +25,8 @@ public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
 
     public override async Task Handle(ClientWantsToRegisterDto dto, IWebSocketConnection socket)
     {
+        await _accountService.CheckIfUserExists(dto.Username, dto.Email);
+        
         var userId = _accountService.Register(dto.Username, dto.Email, dto.Password);
         if (userId <= 0)
         {

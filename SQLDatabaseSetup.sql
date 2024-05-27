@@ -11,7 +11,7 @@ CREATE SCHEMA Corsa;
 create table corsa.users
 (
     id       SERIAL PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
     email    VARCHAR(50) NOT NULL UNIQUE
 );
 

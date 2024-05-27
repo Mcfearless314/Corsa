@@ -1,4 +1,5 @@
 using System.Security.Authentication;
+using Backend.exceptions;
 using Backend.infrastructure.dataModels;
 using Backend.infrastructure.Repositories;
 
@@ -41,7 +42,7 @@ public class AccountService
             _logger.LogError("Authenticate error: {Message}", e);
         }
 
-        throw new InvalidCredentialException("Invalid credential!");
+        throw new AuthenticationFailureException("Invalid username or password.");
     }
 
     /**
@@ -61,5 +62,14 @@ public class AccountService
     public object Get(SessionData data)
     {
         return _userRepository.GetById(data.UserId);
+    }
+
+    public async Task CheckIfUserExists(object username, object email)
+    {
+        bool userExists = await _userRepository.CheckIfUserExists(username, email);
+        if (userExists)
+        {
+            throw new UserAlreadyExistsException("User already exists");
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.exceptions;
 using Backend.infrastructure.dataModels;
 using Backend.service;
 using Fleck;
@@ -26,26 +27,16 @@ public class ClientWantsToLogIn : BaseEventHandler<ClientWantsToLogInDto>
     public override async Task Handle(ClientWantsToLogInDto dto, IWebSocketConnection socket)
     {
         var user = _accountService.Authenticate(dto.Username, dto.Password);
-        if (user == null)
-        {
-            // Authentication failed
-            await socket.Send(JsonSerializer.Serialize(new ServerDeniesLogin
-            {
-                Message = "Authentication failed",
-
-            }));
-            return;
-        }
-
+    
         // Creating a token from the user
-        var token = _jwtService.IssueToken(SessionData.FromUser(user));
+        var token = _jwtService.IssueToken(SessionData.FromUser(user!));
 
         // Send the token to the client
         await socket.Send(JsonSerializer.Serialize(new ServerConfirmsLogin
         {
             Message = "Successfully authenticated",
             Token = new { token },
-            UserId = user.id
+            UserId = user!.id
             
         }));
     }

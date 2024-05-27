@@ -1,5 +1,6 @@
 ﻿using System.Security.Authentication;
 using System.Text.Json;
+using Backend.exceptions;
 using Fleck;
 using lib;
 
@@ -12,11 +13,16 @@ public class GlobalExceptionHandler
         Console.WriteLine(exception.Message);
         Console.WriteLine(exception.InnerException);
         Console.WriteLine(exception.StackTrace);
-        if (exception is AuthenticationException)
+        if (exception is UserAlreadyExistsException)
         {
-            
-            //TODO Switch this out with an real BaseDTO to handle the exceptions you want
-            ws.Send(JsonSerializer.Serialize(new Example
+            ws.Send(JsonSerializer.Serialize(new UserAlreadyExistsExceptionDto
+            {
+                errorMessage = exception.Message
+            }));
+        }
+        else if (exception is AuthenticationFailureException)
+        {
+            ws.Send(JsonSerializer.Serialize(new AuthenticationFailureExceptionDto
             {
                 errorMessage = exception.Message
             }));
@@ -24,7 +30,3 @@ public class GlobalExceptionHandler
     }
 }
 
-public class Example : BaseDto
-{
-    public string errorMessage { get; set; }
-}

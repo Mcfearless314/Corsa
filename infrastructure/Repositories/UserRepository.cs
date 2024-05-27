@@ -60,4 +60,17 @@ FROM corsa.users
             return conn.Query<User>(sql);
         }
     }
+
+    public async Task<bool> CheckIfUserExists(object username, object email)
+    {
+        const string sql = @"   
+        SELECT EXISTS (
+            SELECT 1
+            FROM corsa.users
+            WHERE username = @username OR email = @email
+        )";
+        await using var connection = await _dataSource.OpenConnectionAsync();
+        return await connection.QueryFirstAsync<bool>(sql, new { username, email });
+        
+    }
 }
