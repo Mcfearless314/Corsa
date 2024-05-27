@@ -13,7 +13,7 @@ public class RunRepository
     }
 
     public async Task<string> LogRunToDb(int userId, string runId, double dtoStartingLat, double dtoStartingLng,
-        DateTime? dateTime)
+        DateTime dateTime)
     {
         string insertedRunId = string.Empty;
         try
@@ -64,7 +64,7 @@ public class RunRepository
     }
 
 
-    public async Task LogCoordinatesToDb(string dtoRunId, double dtoLat, double dtoLng, string formattedLoggingTime)
+    public async Task LogCoordinatesToDb(string dtoRunId, double dtoLat, double dtoLng, DateTime formattedLoggingTime)
     {
         try
         {

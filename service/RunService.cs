@@ -14,26 +14,25 @@ public class RunService
     }
 
     public async Task<string> LogRunToDb(int dtoUserId, double dtoStartingLat, double dtoStartingLng,
-        string? dtoRunStartTime)
+        DateTime dtoRunStartTime)
     {
+        string runStartTime = dtoRunStartTime.ToString("s");
+        
         // Remove the '/' and ':' characters from the formattedDateTime string
-        string runId = $"{dtoUserId}_{dtoRunStartTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
-        // Convert dtoRunStartTime to DateTime
-        DateTime dateTime = DateTime.ParseExact(dtoRunStartTime!, "dd/MM/yy HH:mm", CultureInfo.InvariantCulture);
-        return await _runRepository.LogRunToDb(dtoUserId,runId, dtoStartingLat, dtoStartingLng, dateTime);
+        string runId = $"{dtoUserId}_{runStartTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
+        return await _runRepository.LogRunToDb(dtoUserId,runId, dtoStartingLat, dtoStartingLng, dtoRunStartTime);
     }
 
     public async Task LogCoordinatesToDb(string dtoRunId, double dtoLat, double dtoLng, DateTime dtoLoggingTime)
     {
-        string formattedLoggingTime = dtoLoggingTime.ToString();
-        await _runRepository.LogCoordinatesToDb(dtoRunId, dtoLat, dtoLng, formattedLoggingTime);
+        await _runRepository.LogCoordinatesToDb(dtoRunId, dtoLat, dtoLng, dtoLoggingTime);
     }
-
+    
     public async Task<RunInfoWithMap> LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
         DateTime dtoRunEndTime)
     {
-        string formattedEndingTime = dtoRunEndTime.ToString();
-        return await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, formattedEndingTime);
+        string runStartTime = dtoRunEndTime.ToString("s");
+        return await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, runStartTime);
     }
 
     public async Task<string> SaveRunToDb(int dtoUserId, string dtoRunDateTime, string dtoRunTime,
