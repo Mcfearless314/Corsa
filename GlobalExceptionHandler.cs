@@ -34,6 +34,13 @@ public class GlobalExceptionHandler
                 errorMessage = exception.Message
             }));
         }
+        else if (exception is DeviceNotRegisteredException)
+        {
+            ws.Send(JsonSerializer.Serialize(new DeviceNotRegisteredExceptionDto
+            {
+                errorMessage = exception.Message
+            }));
+        }
     }
 }
 
