@@ -1,4 +1,5 @@
-﻿using Backend.infrastructure.dataModels;
+﻿using Backend.exceptions;
+using Backend.infrastructure.dataModels;
 using Backend.infrastructure.Repositories;
 
 namespace Backend.service;
@@ -27,5 +28,18 @@ public class DeviceService
        string runId = $"{userId}_{formattedRunStartTime.Replace("/", "").Replace(":", "").Replace(" ", "")}";
        
        await _deviceRepository.LogCoordinates(runId, userId, runStartTime, runEndTime, timeOfRun, dtoCoordinates);
+    }
+
+    public async Task<bool> IsDeviceRegisteredInDb(string dtoDeviceId)
+    {
+        try
+        {
+            await _deviceRepository.GetUserIdByDevice(dtoDeviceId);
+            return true;
+        }
+        catch (DeviceNotRegisteredException)
+        {
+            return false;
+        }
     }
 }

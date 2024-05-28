@@ -28,11 +28,12 @@ public static class Startup
         builder.Services.AddJwtService();
         builder.Services.AddSingleton<RunService>();
         builder.Services.AddSingleton<AccountService>();
+        builder.Services.AddSingleton<DeviceService>();
         builder.Services.AddSingleton<RunRepository>();
         builder.Services.AddSingleton<UserRepository>();
+        builder.Services.AddSingleton<DeviceRepository>();
         builder.Services.AddSingleton<PasswordHashRepository>();
         builder.Services.AddSingleton<Argon2idPasswordHashAlgorithm>();
-        builder.Services.AddSingleton<RunService>();
         builder.Services.AddNpgsqlDataSource(DatabaseConnector.ProperlyFormattedConnectionString,
             dataSourceBuilder => dataSourceBuilder.EnableParameterLogging());
         

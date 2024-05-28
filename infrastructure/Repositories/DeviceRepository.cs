@@ -53,7 +53,32 @@ public class DeviceRepository
                     cmd.Parameters.AddWithValue("timeOfRun", timeOfRun);
                     await cmd.ExecuteNonQueryAsync();
                 }
-                
+
+                foreach (var coordinate in dtoCoordinates)
+                {
+                    await using (var cmd = new NpgsqlCommand(
+                                     "INSERT INTO corsa.maps (mapID, lat, lng, time) VALUES (@mapId, @lat, @lng, @time)",
+                                     connection))
+                    {
+                        cmd.Parameters.AddWithValue("mapId", runId);
+                        cmd.Parameters.AddWithValue("lat", coordinate.Latitude);
+                        cmd.Parameters.AddWithValue("lng", coordinate.Longitude);
+                        cmd.Parameters.AddWithValue("time", coordinate.TimeStamp);
+                        await cmd.ExecuteNonQueryAsync();
+                    }
+                }
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
         }
+        catch (Exception e)
+        {
+            throw new Exception("Error occurred while logging coordinates: " + e.Message);
+        }
     }
+}
