@@ -44,6 +44,13 @@ CREATE TABLE corsa.maps
     FOREIGN KEY (mapID) REFERENCES Corsa.runs (runID) ON DELETE CASCADE
 );
 
+CREATE TABLE corsa.devices
+(
+    deviceID VARCHAR(20) PRIMARY KEY,
+    user_id  integer   NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Corsa.users (id) ON DELETE CASCADE
+);
+
 SELECT *
 FROM corsa.users;
 SELECT *

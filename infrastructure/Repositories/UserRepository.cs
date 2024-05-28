@@ -71,6 +71,27 @@ FROM corsa.users
         )";
         await using var connection = await _dataSource.OpenConnectionAsync();
         return await connection.QueryFirstAsync<bool>(sql, new { username, email });
-        
+    }
+
+    public async Task<string> RegisterDevice(int dtoUserId, string dtoDeviceId)
+    {
+        const string sql = @"
+        INSERT INTO corsa.devices (deviceID, user_id)
+        VALUES (@dtoDeviceId, @dtoUserId)
+        RETURNING deviceID";
+        await using var connection = await _dataSource.OpenConnectionAsync();
+        return connection.QueryFirst<string>(sql, new { dtoDeviceId, dtoUserId });
+    }
+
+    public async Task<bool> CheckIfDeviceExists(string dtoDeviceId)
+    {
+        const string sql = @"
+        SELECT EXISTS (
+            SELECT 1
+            FROM corsa.devices
+            WHERE deviceID = @dtoDeviceId
+        )";
+        await using var connection = await _dataSource.OpenConnectionAsync();
+        return connection.QueryFirst<bool>(sql, new { dtoDeviceId });
     }
 }

@@ -59,11 +59,6 @@ public class AccountService
         return userId;
     }
 
-    public object Get(SessionData data)
-    {
-        return _userRepository.GetById(data.UserId);
-    }
-
     public async Task CheckIfUserExists(object username, object email)
     {
         bool userExists = await _userRepository.CheckIfUserExists(username, email);
@@ -71,5 +66,16 @@ public class AccountService
         {
             throw new UserAlreadyExistsException("User already exists");
         }
+    }
+
+    public async Task<string> RegisterDevice(int dtoUserId, string dtoDeviceId)
+    {
+        bool deviceAlreadyRegistered = await _userRepository.CheckIfDeviceExists(dtoDeviceId);
+        if (deviceAlreadyRegistered)
+        {
+            throw new DeviceAlreadyRegisteredException("Device already registered");
+        }
+
+        return await _userRepository.RegisterDevice(dtoUserId, dtoDeviceId);
     }
 }

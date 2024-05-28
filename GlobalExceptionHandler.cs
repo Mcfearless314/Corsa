@@ -27,6 +27,13 @@ public class GlobalExceptionHandler
                 errorMessage = exception.Message
             }));
         }
+        else if (exception is DeviceAlreadyRegisteredException)
+        {
+            ws.Send(JsonSerializer.Serialize(new DeviceAlreadyRegisteredExceptionDto
+            {
+                errorMessage = exception.Message
+            }));
+        }
     }
 }
 
