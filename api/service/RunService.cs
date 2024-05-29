@@ -34,6 +34,7 @@ public class RunService
     public async Task<RunInfoWithMap> LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
         DateTime dtoRunEndTime)
     {
+        DistanceCalculator dc = new DistanceCalculator();
         var runInfo = await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, dtoRunEndTime);
 
         if (runInfo.Distance is 0 or null)
@@ -43,7 +44,7 @@ public class RunService
             {
                 var coord1 = runInfo.gpsCordsList[i];
                 var coord2 = runInfo.gpsCordsList[i + 1];
-                totalDistance += CalculateDistance(coord1.Latitude, coord1.Longitude, coord2.Latitude, coord2.Longitude);
+                totalDistance += dc.CalculateDistance(coord1.Latitude, coord1.Longitude, coord2.Latitude, coord2.Longitude);
             }
 
             // Set the distance property
@@ -92,7 +93,12 @@ public class RunService
     }
     
     
-    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    
+}
+
+public class DistanceCalculator
+{
+    public double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
     {
         var R = 6371e3; // metres
         var φ1 = lat1 * Math.PI/180; // φ, λ in radians

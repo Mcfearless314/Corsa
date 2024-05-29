@@ -315,9 +315,9 @@ public class RunRepository
                 {
                     RunId = reader.GetString(0),
                     StartOfRun = reader.GetDateTime(1),
-                    EndOfRun = reader.GetDateTime(2),
+                    EndOfRun = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
                     TimeOfRun = reader.IsDBNull(3) ? "00:00" : reader.GetTimeSpan(3).ToString(),
-                    Distance = reader.IsDBNull(2) ? 0.0 : reader.GetDouble(4),
+                    Distance = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
                     
                 });
             }
@@ -371,7 +371,7 @@ public class RunRepository
 
             // Query the database to retrieve the run info
             await using (var cmd = new NpgsqlCommand(
-                             "SELECT runID, user_id, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE runID = @runId AND user_id = @userId",
+                             "SELECT runID, startOfRun, endOfRun, timeOfRun, distance FROM corsa.runs WHERE runID = @runId AND user_id = @userId",
                              connection))
             {
                 cmd.Parameters.AddWithValue("runId", dtoRunId);
@@ -384,8 +384,8 @@ public class RunRepository
                     {
                         RunId = reader.GetString(0),
                         StartOfRun = reader.GetDateTime(1),
-                        EndOfRun = reader.GetDateTime(2),
-                        TimeOfRun = reader.GetString(3),
+                        EndOfRun = reader.IsDBNull(4) ? null : reader.GetDateTime(2),
+                        TimeOfRun = reader.GetTimeSpan(3).ToString(),
                         Distance = reader.IsDBNull(4) ? null : reader.GetDouble(4),
                         gpsCordsList = new List<Cords>()
                     };

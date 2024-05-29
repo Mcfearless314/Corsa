@@ -1,12 +1,9 @@
-using System.Text.Json;
-using Backend;
+using Backend.service;
 using Backend.ClientEventHandlers;
 using Backend.exceptions;
 using Backend.infrastructure;
 using lib;
-using Microsoft.Extensions.Configuration;
 using Npgsql;
-using Websocket.Client;
 
 namespace Tests;
 
@@ -15,6 +12,8 @@ public class Tests
     [SetUp]
     public void Setup()
     {
+       
+        
         using var conn = new NpgsqlConnection(DatabaseConnector.ProperlyFormattedConnectionString);
         conn.Open();
 
@@ -93,9 +92,9 @@ public async Task Test_1LogARunTest()
 }
 
     
-    [Test]
-    public async Task Test_4RegisterADevice()
-    {
+[Test]
+public async Task Test_4RegisterADevice()
+{
         var ws2 = await new WebSocketTestClient().ConnectAsync();
         await ws2.DoAndAssert(new ClientWantsToRegisterADeviceDto
             {
@@ -104,5 +103,14 @@ public async Task Test_1LogARunTest()
             },
             fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsDeviceRegistration)) == 1; }
         );
+    }
+    
+    [Test]
+    public async Task Test_5CalculateDistanceBetweenTwoCoordinates() {
+        
+        var calc = new DistanceCalculator();   
+        var distance =calc.CalculateDistance(55.487986571921624, 8.446922438743762, -37.80983071669535, 144.96254276912558) / 1000;
+        Assert.AreEqual(16244, distance);
+        
     }
 }

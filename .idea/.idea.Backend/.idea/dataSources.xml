@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://cornelius.db.elephantsql.com:5432/rlmvvysz</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="dmoiwszd@balarama.db.elephantsql.com" uuid="d03e1698-c2cd-43ea-b953-e0441159c4b2">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://balarama.db.elephantsql.com:5432/dmoiwszd</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
