@@ -6,22 +6,23 @@ namespace Backend.service;
 public class WsWithMetaData(IWebSocketConnection connection)
 {
     public IWebSocketConnection Connection { get; set; } = connection;
-
-    public Dictionary<string, RateLimiter> RateLimitPerEvent { get; set; } = new();
+    public bool IsAuthenticated { get; set; } = false;
+    
 }
 
 public static class StateService
 {
-    private static Dictionary<Guid, IWebSocketConnection> _connections = new();
+    private static readonly Dictionary<Guid, WsWithMetaData> _connections = new();
 
-    public static bool AddConnection(IWebSocketConnection ws)
+    public static void AddConnection(Guid clientId, IWebSocketConnection ws)
     {
-        return _connections.TryAdd(ws.ConnectionInfo.Id, ws);
+        _connections.TryAdd(clientId, new WsWithMetaData(ws));
     }
 
 
-    public static bool RemoveConnection(IWebSocketConnection ws)
+    public static void RemoveConnection(Guid clientId)
     {
-        return _connections.Remove(ws.ConnectionInfo.Id);
+        _connections.Remove(clientId);
     }
+   
 }

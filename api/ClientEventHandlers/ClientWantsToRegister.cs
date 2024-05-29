@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Threading.Tasks;
+using Backend.EventFilters;
 using Backend.exceptions;
 using Backend.service;
 using Fleck;
@@ -15,6 +16,7 @@ public class ClientWantsToRegisterDto : BaseDto
 
 }
 
+[RateLimiter(2,30,1,1)]
 public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
 {
     private AccountService _accountService;

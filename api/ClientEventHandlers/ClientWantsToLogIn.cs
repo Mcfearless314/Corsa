@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Threading.Tasks;
+using Backend.EventFilters;
 using Backend.exceptions;
 using Backend.infrastructure.dataModels;
 using Backend.service;
@@ -14,6 +15,7 @@ public class ClientWantsToLogInDto : BaseDto
     public string Password { get; set; }
 }
 
+[RateLimiter(6,30,2,1)]
 public class ClientWantsToLogIn : BaseEventHandler<ClientWantsToLogInDto>
 {
     private AccountService _accountService;
