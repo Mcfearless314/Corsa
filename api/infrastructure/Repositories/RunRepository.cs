@@ -30,7 +30,7 @@ public class RunRepository
                 {
                     cmd.Parameters.AddWithValue("userId", userId);
                     cmd.Parameters.AddWithValue("runId", runId);
-                    cmd.Parameters.AddWithValue("startOfRun", dateTime!);
+                    cmd.Parameters.AddWithValue("startOfRun", dateTime);
                     insertedRunId = (string)await cmd.ExecuteScalarAsync();
                 }
 
@@ -88,7 +88,7 @@ public class RunRepository
     }
 
     public async Task<RunInfoWithMap> LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
-        string formattedEndingTime)
+        DateTime dtoRunEndTime)
     {
         RunInfoWithMap runInfo = null;
         try
@@ -104,13 +104,12 @@ public class RunRepository
                                  connection))
                 {
                     cmd.Parameters.AddWithValue("runId", dtoRunId);
-                    cmd.Parameters.AddWithValue("endOfRun", formattedEndingTime);
+                    cmd.Parameters.AddWithValue("endOfRun", dtoRunEndTime);
 
                     // Calculate timeOfRun
                     var startTime = await GetStartTimeOfRun(connection, dtoRunId);
-                    var endTime = DateTime.Parse(formattedEndingTime);
-                    var timeOfRun = endTime - startTime;
-                    cmd.Parameters.AddWithValue("timeOfRun", timeOfRun.ToString(@"hh\:mm\:ss"));
+                    var timeOfRun = dtoRunEndTime - startTime;
+                    cmd.Parameters.AddWithValue("timeOfRun", timeOfRun);
 
                     await cmd.ExecuteNonQueryAsync();
                 }
@@ -123,7 +122,7 @@ public class RunRepository
                     cmd.Parameters.AddWithValue("mapId", dtoRunId);
                     cmd.Parameters.AddWithValue("lat", dtoEndingLat);
                     cmd.Parameters.AddWithValue("lng", dtoEndingLng);
-                    cmd.Parameters.AddWithValue("time", formattedEndingTime);
+                    cmd.Parameters.AddWithValue("time", dtoRunEndTime);
 
                     await cmd.ExecuteNonQueryAsync();
                 }
@@ -146,16 +145,16 @@ public class RunRepository
                             RunId = reader.GetString(0),
                             StartOfRun = reader.GetDateTime(1),
                             EndOfRun = reader.GetDateTime(2),
-                            TimeOfRun = reader.GetString(3),
-                            Distance = reader.GetDouble(4),
-                            Coordinates = new List<Coordinates>()
+                            TimeOfRun = reader.GetTimeSpan(3).ToString(),
+                            Distance = reader.IsDBNull(4) ? null : reader.GetDouble(4),
+                            gpsCordsList = new List<Cords>()
                         };
                     }
                 }
 
                 // Query the database to retrieve the list of coordinates
                 await using (var cmd = new NpgsqlCommand(
-                                 "SELECT lat, lng FROM corsa.maps WHERE mapID = @mapId ORDER BY time",
+                                 "SELECT lat, lng, time FROM corsa.maps WHERE mapID = @mapId ORDER BY time",
                                  connection))
                 {
                     cmd.Parameters.AddWithValue("mapId", dtoRunId);
@@ -163,7 +162,7 @@ public class RunRepository
                     await using var reader = await cmd.ExecuteReaderAsync();
                     while (await reader.ReadAsync())
                     {
-                        runInfo.Coordinates.Add(new Coordinates
+                        runInfo.gpsCordsList.Add(new Cords
                         {
                             Latitude = reader.GetDouble(0),
                             Longitude = reader.GetDouble(1),
@@ -312,21 +311,14 @@ public class RunRepository
             await using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                var runId = reader["runID"].ToString();
-                var startOfRun = reader.GetDateTime(reader.GetOrdinal("startOfRun"));
-                var endOfRun = reader.IsDBNull(reader.GetOrdinal("endOfRun"))
-                    ? null
-                    : (DateTime?)reader.GetDateTime(reader.GetOrdinal("endOfRun"));
-                var timeOfRun = reader["timeOfRun"].ToString();
-                var distance = Convert.ToDouble(reader["distance"]);
-
-                runs.Add(new RunInfo
+               runs.Add(new RunInfo
                 {
-                    RunId = runId,
-                    StartOfRun = startOfRun,
-                    EndOfRun = endOfRun,
-                    TimeOfRun = timeOfRun,
-                    Distance = distance
+                    RunId = reader.GetString(0),
+                    StartOfRun = reader.GetDateTime(1),
+                    EndOfRun = reader.GetDateTime(2),
+                    TimeOfRun = reader.IsDBNull(3) ? "00:00" : reader.GetTimeSpan(3).ToString(),
+                    Distance = reader.IsDBNull(2) ? 0.0 : reader.GetDouble(4),
+                    
                 });
             }
         }
@@ -354,15 +346,11 @@ public class RunRepository
             await using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                var runId = reader["runID"].ToString();
-                var timeOfRun = reader["timeOfRun"].ToString();
-                var distance = Convert.ToDouble(reader["distance"]);
-
                 progressList.Add(new ProgressInfo
                 {
-                    RunId = runId,
-                    TimeOfRun = timeOfRun,
-                    Distance = distance
+                    RunId = reader.GetString(0),
+                    TimeOfRun = reader.GetTimeSpan(1).ToString(),
+                    Distance = reader.IsDBNull(2) ? 0.0 : reader.GetDouble(4),
                 });
             }
         }
@@ -398,8 +386,8 @@ public class RunRepository
                         StartOfRun = reader.GetDateTime(1),
                         EndOfRun = reader.GetDateTime(2),
                         TimeOfRun = reader.GetString(3),
-                        Distance = reader.GetDouble(4),
-                        Coordinates = new List<Coordinates>()
+                        Distance = reader.IsDBNull(4) ? null : reader.GetDouble(4),
+                        gpsCordsList = new List<Cords>()
                     };
                 }
             }
@@ -414,7 +402,7 @@ public class RunRepository
                 await using var reader = await cmd.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
                 {
-                    runInfo.Coordinates.Add(new Coordinates
+                    runInfo.gpsCordsList.Add(new Cords
                     {
                         Latitude = reader.GetDouble(0),
                         Longitude = reader.GetDouble(1),
@@ -429,5 +417,25 @@ public class RunRepository
         }
 
         return runInfo;
+    }
+
+    public async Task UpdateDistanceOfRun(string dtoRunId, double totalDistance)
+    {
+        try
+        {
+            await using var connection = await _dataSource.OpenConnectionAsync();
+
+            await using var cmd = new NpgsqlCommand(
+                "UPDATE corsa.runs SET distance = @distance WHERE runID = @runId", connection);
+            cmd.Parameters.AddWithValue("runId", dtoRunId);
+            cmd.Parameters.AddWithValue("distance", totalDistance);
+
+            await cmd.ExecuteNonQueryAsync();
+            Console.WriteLine("Distance updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error occurred: " + ex.Message);
+        }
     }
 }

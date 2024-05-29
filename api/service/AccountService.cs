@@ -38,8 +38,7 @@ public class AccountService
         }
         catch (Exception e)
         {
-            //logs the error instead of sending the exact information to the user.
-            _logger.LogError("Authenticate error: {Message}", e);
+            throw new AuthenticationFailureException("Invalid username or password.");
         }
 
         throw new AuthenticationFailureException("Invalid username or password.");

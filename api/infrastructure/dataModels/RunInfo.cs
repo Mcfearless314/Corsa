@@ -9,7 +9,12 @@ public class RunInfo
     public double Distance { get; set; }
 }
 
-public class RunInfoWithMap : RunInfo
+public class RunInfoWithMap
 {
-    public List<Coordinates> Coordinates { get; set; }
+    public string RunId { get; set; }
+    public DateTime StartOfRun { get; set; }
+    public DateTime? EndOfRun { get; set; }
+    public string TimeOfRun { get; set; }
+    public double? Distance { get; set; }
+    public List<Cords> gpsCordsList { get; set; }
 }

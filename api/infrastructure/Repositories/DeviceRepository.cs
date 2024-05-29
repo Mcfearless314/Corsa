@@ -33,7 +33,7 @@ public class DeviceRepository
     }
 
     public async Task LogCoordinates(string runId, int userId, DateTime runStartTime, DateTime runEndTime,
-        TimeSpan timeOfRun, List<Coordinates> dtoCoordinates)
+        TimeSpan timeOfRun, List<Cords> dtoCoordinates)
     {
         try
         {

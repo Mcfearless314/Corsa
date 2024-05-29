@@ -76,9 +76,9 @@ public class MQTTClientService(DeviceRepository deviceRepository)
 
                 var userId = await deviceRepository.GetUserIdByDevice(messageObject!.DeviceId);
 
-                var runStartTime = messageObject.Coordinates[0].TimeStamp;
+                var runStartTime = messageObject.gpsCordsList[0].TimeStamp;
 
-                var runEndTime = messageObject.Coordinates[^1].TimeStamp;
+                var runEndTime = messageObject.gpsCordsList[^1].TimeStamp;
 
                 var formattedRunStartTime = runStartTime.ToString("s");
 
@@ -87,7 +87,7 @@ public class MQTTClientService(DeviceRepository deviceRepository)
                 string runId = $"{userId}_{formattedRunStartTime.Replace("/", "").Replace(":", "").Replace(" ", "")}";
 
                 await deviceRepository.LogCoordinates(runId, userId, runStartTime, runEndTime, timeOfRun,
-                    messageObject.Coordinates);
+                    messageObject.gpsCordsList);
             }
             catch (Exception exc)
             {

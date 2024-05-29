@@ -28,11 +28,11 @@ public class ClientWantsToStopARun : BaseEventHandler<ClientWantsToStopARunDto>
 
     public override async Task Handle(ClientWantsToStopARunDto dto, IWebSocketConnection socket)
     {
-         var RunCompleted = await _runService.LogEndingOfRunToDb(dto.RunId, dto.EndingLat, dto.EndingLng, dto.RunEndTime);
+         var runCompleted = await _runService.LogEndingOfRunToDb(dto.RunId, dto.EndingLat, dto.EndingLng, dto.RunEndTime);
          var response = new ServerSendsBackRunWithMap
          {
-             Message = "Run successfully stopped: " + RunCompleted,
-             FullRunInfo = RunCompleted
+             Message = "Run successfully stopped: " + runCompleted.RunId,
+             FullRunInfo = runCompleted
          };
          
             await socket.Send(JsonSerializer.Serialize(response));

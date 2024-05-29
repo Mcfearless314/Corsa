@@ -13,7 +13,7 @@ public class DeviceService
         _deviceRepository = deviceRepository;
     }
 
-    public async Task LogCoordinates(string dtoDeviceId, List<Coordinates> dtoCoordinates)
+    public async Task LogCoordinates(string dtoDeviceId, List<Cords> dtoCoordinates)
     {
        var userId = await _deviceRepository.GetUserIdByDevice(dtoDeviceId);
        

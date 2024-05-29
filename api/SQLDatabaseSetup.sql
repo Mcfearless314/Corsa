@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS corsa.devices;
 DROP TABLE IF EXISTS corsa.maps;
 DROP TABLE IF EXISTS corsa.runs;
 DROP TABLE IF EXISTS corsa.password_hash;
@@ -50,12 +51,3 @@ CREATE TABLE corsa.devices
     user_id  integer   NOT NULL,
     FOREIGN KEY (user_id) REFERENCES Corsa.users (id) ON DELETE CASCADE
 );
-
-SELECT *
-FROM corsa.users;
-SELECT *
-FROM corsa.password_hash;
-SELECT *
-FROM corsa.runs;
-SELECT *
-FROM corsa.maps;

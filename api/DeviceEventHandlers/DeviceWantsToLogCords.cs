@@ -8,7 +8,7 @@ namespace Backend.DeviceEventHandlers;
 public class DeviceWantsToLogCordsDto : BaseDto
 {
     public string DeviceId { get; set; }
-    public List<Coordinates> Coordinates { get; set; }
+    public List<Cords> gpsCordsList { get; set; }
 }
 
 public class DeviceWantsToLogCords : BaseEventHandler<DeviceWantsToLogCordsDto>
@@ -22,6 +22,6 @@ public class DeviceWantsToLogCords : BaseEventHandler<DeviceWantsToLogCordsDto>
 
     public override async Task Handle(DeviceWantsToLogCordsDto dto, IWebSocketConnection socket)
     {
-        await _deviceService.LogCoordinates(dto.DeviceId, dto.Coordinates);
+        await _deviceService.LogCoordinates(dto.DeviceId, dto.gpsCordsList);
     }
 }

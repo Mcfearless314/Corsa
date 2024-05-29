@@ -34,8 +34,30 @@ public class RunService
     public async Task<RunInfoWithMap> LogEndingOfRunToDb(string dtoRunId, double dtoEndingLat, double dtoEndingLng,
         DateTime dtoRunEndTime)
     {
-        string runStartTime = dtoRunEndTime.ToString("s");
-        return await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, runStartTime);
+        var runInfo = await _runRepository.LogEndingOfRunToDb(dtoRunId, dtoEndingLat, dtoEndingLng, dtoRunEndTime);
+
+        if (runInfo.Distance is 0 or null)
+        {
+            double totalDistance = 0;
+            for (int i = 0; i < runInfo.gpsCordsList.Count - 1; i++)
+            {
+                var coord1 = runInfo.gpsCordsList[i];
+                var coord2 = runInfo.gpsCordsList[i + 1];
+                totalDistance += CalculateDistance(coord1.Latitude, coord1.Longitude, coord2.Latitude, coord2.Longitude);
+            }
+
+            // Set the distance property
+            runInfo.Distance = totalDistance;
+            
+            // Update the distance in the database
+            await _runRepository.UpdateDistanceOfRun(dtoRunId, totalDistance);
+
+            return runInfo;
+        }
+
+        return runInfo;
+       
+        
     }
 
     public async Task<string> SaveRunToDb(int dtoUserId, string dtoRunDateTime, string dtoRunTime,
@@ -67,5 +89,23 @@ public class RunService
     public async Task<RunInfoWithMap> GetFullInfoOfRun(int dtoUserId, string dtoRunId)
     {   
         return await _runRepository.GetFullInfoOfRun(dtoUserId, dtoRunId);
+    }
+    
+    
+    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    {
+        var R = 6371e3; // metres
+        var φ1 = lat1 * Math.PI/180; // φ, λ in radians
+        var φ2 = lat2 * Math.PI/180;
+        var Δφ = (lat2-lat1) * Math.PI/180;
+        var Δλ = (lon2-lon1) * Math.PI/180;
+
+        var a = Math.Sin(Δφ/2) * Math.Sin(Δφ/2) +
+                Math.Cos(φ1) * Math.Cos(φ2) *
+                Math.Sin(Δλ/2) * Math.Sin(Δλ/2);
+        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1-a));
+
+        var distance = R * c; // in metres
+        return distance;
     }
 }
