@@ -81,4 +81,23 @@ public class DeviceRepository
             throw new Exception("Error occurred while logging coordinates: " + e.Message);
         }
     }
+
+    public async Task<string> IsDeviceRegisteredInDb(string deviceId)
+    {
+        try
+        {
+            await using var connection = await _dataSource.OpenConnectionAsync();
+
+            await using var cmd = new NpgsqlCommand("SELECT deviceId FROM corsa.devices WHERE deviceID = @deviceId",
+                connection);
+            cmd.Parameters.AddWithValue("deviceId", deviceId);
+
+            string deviceIdInDb = (string)await cmd.ExecuteScalarAsync();
+            return deviceIdInDb;
+        }
+        catch (Exception e)
+        {
+            throw new DeviceNotRegisteredException("Device has no user attached");
+        }
+    }
 }

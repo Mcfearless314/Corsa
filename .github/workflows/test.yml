@@ -11,3 +11,6 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - run: cd Tests && dotnet test
+        env: 
+          DBConnectionString: ${{ secrets.DBConnectionString }}
+          Flespitoken: ${{ secrets.Flespitoken }}
