@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Backend.EventFilters;
 using Backend.exceptions;
@@ -9,9 +10,15 @@ using lib;
 
 namespace Backend.ClientEventHandlers;
 
+[ValidateDataAnnotations]
+[RateLimiter(5,30,2,1)]
 public class ClientWantsToLogInDto : BaseDto
 {
+    [MinLength(3)]
     public string Username { get; set; }
+    
+    [MinLength(8)]
+    [MaxLength(32)]
     public string Password { get; set; }
 }
 

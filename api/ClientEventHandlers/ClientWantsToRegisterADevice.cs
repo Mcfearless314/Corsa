@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Backend.service;
 using Fleck;
@@ -8,6 +9,8 @@ namespace Backend.ClientEventHandlers;
 
 public class ClientWantsToRegisterADeviceDto : BaseDto
 {
+    [Required]
+    [MinLength(8)]
     public string DeviceId { get; set; }
     public int UserId { get; set; }
 }

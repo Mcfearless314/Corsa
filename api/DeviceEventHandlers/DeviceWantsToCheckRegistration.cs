@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using Backend.service;
 using Fleck;
 using lib;
@@ -7,6 +8,8 @@ namespace Backend.DeviceEventHandlers;
 
 public class DeviceWantsToCheckRegistrationDto : BaseDto
 {
+    [Required]
+    [MinLength(8)]
     public string DeviceId { get; set; }
 }
 

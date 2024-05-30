@@ -1,4 +1,5 @@
-﻿using Backend.infrastructure.dataModels;
+﻿using System.ComponentModel.DataAnnotations;
+using Backend.infrastructure.dataModels;
 using Backend.service;
 using Fleck;
 using lib;
@@ -7,6 +8,8 @@ namespace Backend.DeviceEventHandlers;
 
 public class DeviceWantsToLogCordsDto : BaseDto
 {
+    [Required]
+    [MinLength(8)]
     public string DeviceId { get; set; }
     public List<Cords> gpsCordsList { get; set; }
 }

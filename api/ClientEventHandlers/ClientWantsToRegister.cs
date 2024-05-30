@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Backend.EventFilters;
 using Backend.exceptions;
@@ -10,8 +11,17 @@ namespace Backend.ClientEventHandlers;
 
 public class ClientWantsToRegisterDto : BaseDto
 {
+    [Required]
+    [EmailAddress]
     public string Email { get; set; }
+    
+    [Required]
+    [MinLength(3)]
     public string Username { get; set; }
+    
+    [Required]
+    [MinLength(8)]
+    [MaxLength(32)]
     public string Password { get; set; }
 
 }
