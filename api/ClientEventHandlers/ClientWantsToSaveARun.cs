@@ -7,13 +7,13 @@ namespace Backend.ClientEventHandlers;
 
 public class ClientWantsToSaveARunDto : BaseDto
 {
-    public string? RunDateTime { get; set; }
+    public string RunDateTime { get; set; }
 
     public int UserId { get; set; }
 
     public double RunDistance { get; set; }
 
-    public string? RunTime { get; set; }
+    public TimeSpan RunTime { get; set; }
 
 }
 

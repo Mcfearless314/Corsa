@@ -65,15 +65,14 @@ public class RunService
         
     }
 
-    public async Task<string> SaveRunToDb(int dtoUserId, string dtoRunDateTime, string dtoRunTime,
+    public async Task<string> SaveRunToDb(int dtoUserId, string dtoRunDateTime, TimeSpan dtoRunTime,
         double dtoRunDistance)
     {
         // Convert dtoRunStartTime to DateTime
         DateTime dateTime = DateTime.ParseExact(dtoRunDateTime!, "dd/MM/yy HH:mm", CultureInfo.InvariantCulture);
         // Remove the '/' and ':' characters from the formattedDateTime string
         string runId = $"{dtoUserId}_{dtoRunDateTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
-        TimeSpan runTime = TimeSpan.Parse(dtoRunTime);
-        return await _runRepository.SaveRunToDb(runId, dtoUserId, dateTime, runTime, dtoRunDistance);
+        return await _runRepository.SaveRunToDb(runId, dtoUserId, dateTime, dtoRunTime, dtoRunDistance);
     }
 
     public async Task<string> DeleteRunFromDb(int dtoUserId, string dtoRunId)

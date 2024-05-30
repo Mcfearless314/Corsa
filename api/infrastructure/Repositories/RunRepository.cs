@@ -145,7 +145,7 @@ public class RunRepository
                             RunId = reader.GetString(0),
                             StartOfRun = reader.GetDateTime(1),
                             EndOfRun = reader.GetDateTime(2),
-                            TimeOfRun = reader.GetTimeSpan(3).ToString(),
+                            TimeOfRun = reader.GetTimeSpan(3),
                             Distance = reader.IsDBNull(4) ? null : reader.GetDouble(4),
                             gpsCordsList = new List<Cords>()
                         };
@@ -196,8 +196,8 @@ public class RunRepository
         return Convert.ToDateTime(startTime);
     }
 
-    public async Task<string> SaveRunToDb(string runId, double dtoUserId, DateTime RunDateTime,
-        TimeSpan formattedRunTime, double dtoRunDistance)
+    public async Task<string> SaveRunToDb(string runId, double dtoUserId, DateTime runDateTime,
+        TimeSpan runTime, double dtoRunDistance)
     {
         string insertedRunId = string.Empty;
         try
@@ -214,8 +214,8 @@ public class RunRepository
                 {
                     cmd.Parameters.AddWithValue("runId", runId);
                     cmd.Parameters.AddWithValue("userId", dtoUserId);
-                    cmd.Parameters.AddWithValue("startOfRun", RunDateTime);
-                    cmd.Parameters.AddWithValue("timeOfRun", formattedRunTime);
+                    cmd.Parameters.AddWithValue("startOfRun", runDateTime);
+                    cmd.Parameters.AddWithValue("timeOfRun", runTime);
                     cmd.Parameters.AddWithValue("distance", dtoRunDistance);
 
                     insertedRunId = (string)await cmd.ExecuteScalarAsync();
@@ -316,7 +316,7 @@ public class RunRepository
                     RunId = reader.GetString(0),
                     StartOfRun = reader.GetDateTime(1),
                     EndOfRun = reader.IsDBNull(2) ? null : reader.GetDateTime(2),
-                    TimeOfRun = reader.IsDBNull(3) ? "00:00" : reader.GetTimeSpan(3).ToString(),
+                    TimeOfRun = reader.IsDBNull(3) ? TimeSpan.Zero : reader.GetTimeSpan(3),
                     Distance = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
                     
                 });
@@ -385,7 +385,7 @@ public class RunRepository
                         RunId = reader.GetString(0),
                         StartOfRun = reader.GetDateTime(1),
                         EndOfRun = reader.IsDBNull(4) ? null : reader.GetDateTime(2),
-                        TimeOfRun = reader.GetTimeSpan(3).ToString(),
+                        TimeOfRun = reader.GetTimeSpan(3),
                         Distance = reader.IsDBNull(4) ? null : reader.GetDouble(4),
                         gpsCordsList = new List<Cords>()
                     };
