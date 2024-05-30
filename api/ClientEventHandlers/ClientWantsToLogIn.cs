@@ -11,7 +11,7 @@ using lib;
 namespace Backend.ClientEventHandlers;
 
 [ValidateDataAnnotations]
-[RateLimiter(5,30,2,1)]
+//[RateLimiter(5,30,2,1)]
 public class ClientWantsToLogInDto : BaseDto
 {
     [MinLength(3)]

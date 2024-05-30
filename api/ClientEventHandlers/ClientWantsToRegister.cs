@@ -26,7 +26,7 @@ public class ClientWantsToRegisterDto : BaseDto
 
 }
 
-[RateLimiter(2,30,1,1)]
+//[RateLimiter(2,30,1,1)]
 public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
 {
     private AccountService _accountService;

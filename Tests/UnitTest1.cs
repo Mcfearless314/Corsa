@@ -17,6 +17,8 @@ public class Tests
     [SetUp]
     public void Setup()
     {
+        Startup.Statup(null);
+        
         using var conn = new NpgsqlConnection(DatabaseConnector.ProperlyFormattedConnectionString);
         conn.Open();
 
@@ -29,33 +31,10 @@ public class Tests
     }
 
 
-    [Test]
-    public async Task Test_3LoginTests()
-    {
-        var ws = await new WebSocketTestClient().ConnectAsync();
-        await ws.DoAndAssert(new ClientWantsToLogInDto
-            {
-                Username = "test",
-                Password = "test",
-            },
-            fromServer =>
-            {
-                return fromServer.Count(dto => dto.eventType == nameof(AuthenticationFailureException)) == 1;
-            }
-        );
-
-        var ws2 = await new WebSocketTestClient().ConnectAsync();
-        await ws2.DoAndAssert(new ClientWantsToLogInDto
-            {
-                Username = "Miran",
-                Password = "Test12345",
-            },
-            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsLogin)) == 1; }
-        );
-    }
+    
 
     [Test]
-    public async Task Test_2RegistrationTest()
+    public async Task Test_1RegistrationTest()
     {
         var ws = await new WebSocketTestClient().ConnectAsync();
         await ws.DoAndAssert(new ClientWantsToRegisterDto
@@ -76,9 +55,34 @@ public class Tests
             fromServer => { return fromServer.Count(dto => dto.eventType == nameof(UserAlreadyExistsException)) == 1; }
         );
     }
+    
+    [Test]
+    public async Task Test_2LoginTests()
+    {
+        var ws = await new WebSocketTestClient().ConnectAsync();
+        await ws.DoAndAssert(new ClientWantsToLogInDto
+            {
+                Username = "Test12345",
+                Password = "Test12345",
+            },
+            fromServer =>
+            {
+                return fromServer.Count(dto => dto.eventType == nameof(AuthenticationFailureException)) == 1;
+            }
+        );
+
+        var ws2 = await new WebSocketTestClient().ConnectAsync();
+        await ws2.DoAndAssert(new ClientWantsToLogInDto
+            {
+                Username = "Miran",
+                Password = "Test12345",
+            },
+            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsLogin)) == 1; }
+        );
+    }
 
     [Test]
-    public async Task Test_1LogARunTest()
+    public async Task Test_3LogARunTest()
     {
         var ws2 = await new WebSocketTestClient().ConnectAsync();
         await ws2.DoAndAssert(new ClientWantsToLogARunDto
@@ -100,7 +104,7 @@ public class Tests
         await ws2.DoAndAssert(new ClientWantsToRegisterADeviceDto
             {
                 UserId = 1,
-                DeviceId = "1234",
+                DeviceId = "123456789",
             },
             fromServer =>
             {

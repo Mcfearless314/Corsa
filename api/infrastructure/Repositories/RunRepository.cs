@@ -12,10 +12,10 @@ public class RunRepository
         _dataSource = datasource;
     }
 
-    public async Task<string> LogRunToDb(int userId, string runId, double dtoStartingLat, double dtoStartingLng,
+    public async Task<string?> LogRunToDb(int userId, string runId, double dtoStartingLat, double dtoStartingLng,
         DateTime dateTime)
     {
-        string insertedRunId = string.Empty;
+        string? insertedRunId = null;
         try
         {
             await using var connection = await _dataSource.OpenConnectionAsync();

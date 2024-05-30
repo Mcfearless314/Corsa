@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using Backend.exceptions;
 using Backend.infrastructure.dataModels;
 using Backend.infrastructure.Repositories;
 
@@ -23,7 +24,10 @@ public class RunService
         
         // Remove the '/' and ':' characters from the formattedDateTime string
         string runId = $"{dtoUserId}_{runStartTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
-        return await _runRepository.LogRunToDb(dtoUserId,runId, dtoStartingLat, dtoStartingLng, dtoRunStartTime);
+        var loggedId = await _runRepository.LogRunToDb(dtoUserId,runId, dtoStartingLat, dtoStartingLng, dtoRunStartTime);
+        if (loggedId is null)
+            throw new LoggingOfRunFailedException("Logging of run failed");
+        return loggedId;
     }
 
     public async Task LogCoordinatesToDb(string dtoRunId, double dtoLat, double dtoLng, DateTime dtoLoggingTime)
