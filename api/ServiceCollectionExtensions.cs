@@ -1,3 +1,4 @@
+using System.Text;
 using Backend.service;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
@@ -23,12 +24,15 @@ public static class ServiceCollectionExtensions
         // When using AddSingleton, a single instance of this IServiceCollection is created for the lifetime of the application
         services.AddSingleton<JwtOptions>(services =>
         {
-            var configuration = services.GetRequiredService<IConfiguration>();
+           
             //The keyword comes from the appsettings.Development.json. It is a secret from there called JWT
             //The secret is used to sign and verify JWT's
             //A new secret can be produced in the terminal using: openssl rand -base64 64
-            var options = configuration.GetRequiredSection("JWT").Get<JwtOptions>()!;
-
+            var options = new JwtOptions
+            {
+                Secret = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")),
+                Lifetime = TimeSpan.FromHours(Convert.ToDouble(Environment.GetEnvironmentVariable("JWT_LIFETIME"))),
+            };
             // If address isn't set in the config then we are likely running in development mode.
             // We will use the address of the server as *issuer* for JWT.
             if (string.IsNullOrEmpty(options?.Address))
