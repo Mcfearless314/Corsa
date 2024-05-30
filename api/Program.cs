@@ -13,11 +13,11 @@ public static class Startup
 {
     public static void Main(string[] args)
     {
-        Statup(args);
-        Console.ReadLine();
+        var app =Statup(args);
+        app.Run();
     }
 
-    public static void Statup(string[] args)
+    public static WebApplication Statup(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -44,13 +44,39 @@ public static class Startup
         var clientEventHandlers = builder.FindAndInjectClientEventHandlers(Assembly.GetExecutingAssembly());
 
         var app = builder.Build();
+        builder.WebHost.UseUrls("http://*:4545");
 
-
-        var server = new WebSocketServer("ws://0.0.0.0:8181");
+        var port = Environment.GetEnvironmentVariable("PORT") ?? "8181";
+        var server = new WebSocketServer("ws://0.0.0.0:"+port);
 
         server.Start(ws =>
         {
-            ws.OnClose = () => { StateService.RemoveConnection(ws.ConnectionInfo.Id); };
+            var keepAliveInterval = TimeSpan.FromSeconds(30);
+            var keepAliveTimer = new System.Timers.Timer(keepAliveInterval.TotalMilliseconds)
+            {
+                AutoReset = true,
+                Enabled = true
+            };
+            keepAliveTimer.Elapsed += (sender, e) =>
+            {
+                try
+                {
+                    ws.Send("ping");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception in keep-alive timer: " + ex.Message);
+                    keepAliveTimer.Stop();
+                }
+
+            };
+           
+            
+            ws.OnClose = () =>
+            {
+                StateService.RemoveConnection(ws.ConnectionInfo.Id);
+                keepAliveTimer.Stop();
+            };
 
             ws.OnOpen =  () => { StateService.AddConnection(ws.ConnectionInfo.Id, ws); };
 
@@ -66,6 +92,8 @@ public static class Startup
                 }
             };
         });
+        
         app.Services.GetService<MQTTClientService>().CommunicateWithBroker();
+        return app;
     }
 }
