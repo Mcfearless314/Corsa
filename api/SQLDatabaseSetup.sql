@@ -52,9 +52,9 @@ CREATE TABLE corsa.devices
     FOREIGN KEY (user_id) REFERENCES Corsa.users (id) ON DELETE CASCADE
 );
 
-INSERT INTO corsa.users (username, email) VALUES ('Miran', 'Miran.Komadina@gmail.com');
-INSERT INTO corsa.password_hash (user_id, hash, salt, algorithm) VALUES 
-(1, 
-'5XRn1ssg1hrJan648Dum+6cy2YFQ/Rh0FM3WAFByR/Zt79OWmzBEfUUivn3nTKCt2PzquTOJLqHjL8hjBAfuYR01a1X65o+GHGZPZZukkGSCSoNkOSW0mpjtdktoZWoZmlg5QFAuMKxAMZg/DTyNDEjWwXpM7N+kSG83vMtn1YEgVeDh9AqQqrPJ9gXaLLnNHcnM864sTk02IY9+ynwjxZb1rn9l4BgapQ2UDVFtYhVMT1Z6ggz4bhQPi5Xw2VBVMf0uNRZ+eo3HcFRlCJVi1aSGRfpjPwK3+HQb9Abgy6pLBNKOtMMkhynSeHC0RC+q5NCodfYsj0auENTxmQ9pvg==',
- 'CzRFEgITvo52HcZl+XM0qXK3a+kgxCAgbmA58XoB7tCNnZWayqlH+mlh49Ke1Rz3Wti58+psvyKdWqDlf2CkDSjA7vZSFN1T4OufPz22c+4uuC3IHZuHTGPWbvvgRSSb0g2znPBeVpcaYhGkqG+rGTD1egW9R+71sFXY9Wk6cJw=',
-'argon2id');
+--INSERT INTO corsa.users (username, email) VALUES ('Miran', 'Miran.Komadina@gmail.com');
+--INSERT INTO corsa.password_hash (user_id, hash, salt, algorithm) VALUES 
+--(1, 
+--'5XRn1ssg1hrJan648Dum+6cy2YFQ/Rh0FM3WAFByR/Zt79OWmzBEfUUivn3nTKCt2PzquTOJLqHjL8hjBAfuYR01a1X65o+GHGZPZZukkGSCSoNkOSW0mpjtdktoZWoZmlg5QFAuMKxAMZg/DTyNDEjWwXpM7N+kSG83vMtn1YEgVeDh9AqQqrPJ9gXaLLnNHcnM864sTk02IY9+ynwjxZb1rn9l4BgapQ2UDVFtYhVMT1Z6ggz4bhQPi5Xw2VBVMf0uNRZ+eo3HcFRlCJVi1aSGRfpjPwK3+HQb9Abgy6pLBNKOtMMkhynSeHC0RC+q5NCodfYsj0auENTxmQ9pvg==',
+-- 'CzRFEgITvo52HcZl+XM0qXK3a+kgxCAgbmA58XoB7tCNnZWayqlH+mlh49Ke1Rz3Wti58+psvyKdWqDlf2CkDSjA7vZSFN1T4OufPz22c+4uuC3IHZuHTGPWbvvgRSSb0g2znPBeVpcaYhGkqG+rGTD1egW9R+71sFXY9Wk6cJw=',
+--'argon2id');

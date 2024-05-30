@@ -21,3 +21,5 @@ jobs:
         env:
           HD_DBConnectionString: ${{ secrets.HD_DBConnectionString }}
           HD_Flespitoken: ${{ secrets.HD_Flespitoken }}
+          HD_JWT_SECRET: ${{ secrets.HD_JWT_SECRET }}
+          HD_JWT_LIFETIME: ${{ secrets.HD_JWT_LIFETIME }}
