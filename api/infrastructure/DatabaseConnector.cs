@@ -4,7 +4,7 @@ namespace Backend.infrastructure;
 
 public class DatabaseConnector
 {
-    private static readonly Uri Uri = new Uri(Environment.GetEnvironmentVariable("HD_DBConnectionString")!);
+    private static readonly Uri Uri = new Uri(Environment.GetEnvironmentVariable("DBConnectionString")!);
 
     public static readonly string
         ProperlyFormattedConnectionString = string.Format(

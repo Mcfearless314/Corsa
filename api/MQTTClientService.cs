@@ -20,7 +20,7 @@ public class MQTTClientService(DeviceRepository deviceRepository)
         var mqttClientOptions1 = new MqttClientOptionsBuilder()
             .WithTcpServer("mqtt.flespi.io", 1883)
             .WithProtocolVersion(MqttProtocolVersion.V500)
-            .WithCredentials("HD_FlespiToken "+ Environment.GetEnvironmentVariable("Flespitoken"), "")
+            .WithCredentials("FlespiToken "+ Environment.GetEnvironmentVariable("Flespitoken"), "")
             .Build();
 
         await mqttClient.ConnectAsync(mqttClientOptions1, CancellationToken.None);
@@ -68,7 +68,7 @@ public class MQTTClientService(DeviceRepository deviceRepository)
         var mqttClientOptions2 = new MqttClientOptionsBuilder()
             .WithTcpServer("mqtt.flespi.io", 1883)
             .WithProtocolVersion(MqttProtocolVersion.V500)
-            .WithCredentials("HD_FlespiToken "+ Environment.GetEnvironmentVariable("Flespitoken"), "")
+            .WithCredentials("FlespiToken "+ Environment.GetEnvironmentVariable("Flespitoken"), "")
             .Build();
         
         await mqttClient2.ConnectAsync(mqttClientOptions2, CancellationToken.None);
