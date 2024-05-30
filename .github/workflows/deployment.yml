@@ -19,4 +19,5 @@ jobs:
           usedocker: false
           appdir: "api"
         env:
-          HD_AZ: ${{ secrets.HD_AZ }}
+          HD_DBConnectionString: ${{ secrets.HD_DBConnectionString }}
+          HD_Flespitoken: ${{ secrets.HD_Flespitoken }}
