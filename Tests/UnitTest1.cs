@@ -40,19 +40,20 @@ public class Tests
         await ws.DoAndAssert(new ClientWantsToRegisterDto
             {
                 Username = "Miran",
-                Email = "Miran@gmail.com",
-                Password = "Test12345",
-            },
-            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
-        );
-
-        await ws.DoAndAssert(new ClientWantsToRegisterDto
-            {
-                Username = "Miran",
                 Email = "Test@gmail.com",
-                Password = "Test12345",
+                Password = "Miran12345",
             },
             fromServer => { return fromServer.Count(dto => dto.eventType == nameof(UserAlreadyExistsException)) == 1; }
+        );
+        
+        var ws2 = await new WebSocketTestClient().ConnectAsync();
+        await ws2.DoAndAssert(new ClientWantsToRegisterDto
+            {
+                Username = "Miran2",
+                Email = "Test@gmail.com",
+                Password = "Miran12345",
+            },
+            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
         );
     }
     
@@ -75,7 +76,7 @@ public class Tests
         await ws2.DoAndAssert(new ClientWantsToLogInDto
             {
                 Username = "Miran",
-                Password = "Test12345",
+                Password = "Miran12345",
             },
             fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsLogin)) == 1; }
         );
@@ -114,7 +115,7 @@ public class Tests
     }
 
     [Test]
-    public async Task Test_5CalculateDistanceBetweenTwoCoordinates()
+    public void Test_5CalculateDistanceBetweenTwoCoordinates()
     {
         var calc = new DistanceCalculator();
         var distance =
@@ -123,4 +124,36 @@ public class Tests
         var roundedDistance = Math.Round(distance, 0);
         Assert.That(roundedDistance, Is.EqualTo(16245));
     }
+
+    [Test]
+    public async Task Test_6LogARunAndDeleteIt()
+    {
+        DateTime now = DateTime.Now;
+        string runStartTime = now.ToString("s");
+        int userId = 1;
+        string runId = $"{userId}_{runStartTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
+        var ws = await new WebSocketTestClient().ConnectAsync();
+        await ws.DoAndAssert(new ClientWantsToLogARunDto
+            {
+                UserId = userId,
+                RunStartTime = now,
+                StartingLat = 1.0,
+                StartingLng = 1.0,
+            },
+            fromServer =>
+            { return fromServer.Count(dto => dto.eventType == nameof(ServerSendsBackRunId)) == 1; }
+        );
+        
+        var ws2 = await new WebSocketTestClient().ConnectAsync();
+        await ws2.DoAndAssert(new ClientWantsToDeleteARunDto
+            {
+                UserId = 1,
+                RunId = runId,
+            },
+            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsDeletionOfRun)) == 1; }
+        );
+    }
+        
+    
+    
 }

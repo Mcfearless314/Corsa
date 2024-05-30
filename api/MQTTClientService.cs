@@ -15,17 +15,18 @@ public class MQTTClientService(DeviceRepository deviceRepository)
     {
         var mqttFactory = new MqttFactory();
         var mqttClient = mqttFactory.CreateMqttClient();
+        var mqttClient2 = mqttFactory.CreateMqttClient();
 
-        var mqttClientOptions = new MqttClientOptionsBuilder()
-            .WithTcpServer("localhost", 1883)
+        var mqttClientOptions1 = new MqttClientOptionsBuilder()
+            .WithTcpServer("mqtt.flespi.io", 1883)
             .WithProtocolVersion(MqttProtocolVersion.V500)
-            .WithCredentials("Flespitoken "+ Environment.GetEnvironmentVariable("Flespitoken"))
+            .WithCredentials("FlespiToken "+ Environment.GetEnvironmentVariable("Flespitoken"), "")
             .Build();
 
-        await mqttClient.ConnectAsync(mqttClientOptions, CancellationToken.None);
+        await mqttClient.ConnectAsync(mqttClientOptions1, CancellationToken.None);
 
         var mqttSubForCheck = mqttFactory.CreateSubscribeOptionsBuilder()
-            .WithTopicFilter(f => f.WithTopic("device/registration/check/"))
+            .WithTopicFilter(f => f.WithTopic("devices/registration/check"))
             .Build();
 
         await mqttClient.SubscribeAsync(mqttSubForCheck, CancellationToken.None);
@@ -37,10 +38,10 @@ public class MQTTClientService(DeviceRepository deviceRepository)
                 Console.WriteLine("Received message: " + message);
                 var messageObject = JsonSerializer.Deserialize<DeviceWantsToCheckRegistrationDto>(message);
                 var isRegistered = await deviceRepository.IsDeviceRegisteredInDb(messageObject!.DeviceId);
-                if (isRegistered.IsNullOrEmpty())
+                if (!isRegistered.IsNullOrEmpty())
                 {
                     var pongMessage = new MqttApplicationMessageBuilder()
-                        .WithTopic("device/registration/response/" + isRegistered + "/regSuccess")
+                        .WithTopic("devices/registration/response/" + isRegistered + "/regSuccess")
                         .WithQualityOfServiceLevel(e.ApplicationMessage.QualityOfServiceLevel)
                         .WithRetainFlag(e.ApplicationMessage.Retain)
                         .Build();
@@ -49,7 +50,7 @@ public class MQTTClientService(DeviceRepository deviceRepository)
                 else
                 {
                     var pongMessage = new MqttApplicationMessageBuilder()
-                        .WithTopic("device/registration/response/" + messageObject.DeviceId + "/regFail")
+                        .WithTopic("devices/registration/response/" + messageObject.DeviceId + "/regFail")
                         .WithQualityOfServiceLevel(e.ApplicationMessage.QualityOfServiceLevel)
                         .WithRetainFlag(e.ApplicationMessage.Retain)
                         .Build();
@@ -63,11 +64,19 @@ public class MQTTClientService(DeviceRepository deviceRepository)
                 Console.WriteLine(exc.StackTrace);
             }
         };
-        var mqttSubForGps = mqttFactory.CreateSubscribeOptionsBuilder()
-            .WithTopicFilter(f => f.WithTopic("gps/data/"))
+        
+        var mqttClientOptions2 = new MqttClientOptionsBuilder()
+            .WithTcpServer("mqtt.flespi.io", 1883)
+            .WithProtocolVersion(MqttProtocolVersion.V500)
+            .WithCredentials("FlespiToken "+ Environment.GetEnvironmentVariable("Flespitoken"), "")
             .Build();
-        await mqttClient.SubscribeAsync(mqttSubForGps, CancellationToken.None);
-        mqttClient.ApplicationMessageReceivedAsync += async e =>
+        
+        await mqttClient2.ConnectAsync(mqttClientOptions2, CancellationToken.None);
+        var mqttSubForGps = mqttFactory.CreateSubscribeOptionsBuilder()
+            .WithTopicFilter(f => f.WithTopic("gps/data"))
+            .Build();
+        await mqttClient2.SubscribeAsync(mqttSubForGps, CancellationToken.None);
+        mqttClient2.ApplicationMessageReceivedAsync += async e =>
         {
             try
             {

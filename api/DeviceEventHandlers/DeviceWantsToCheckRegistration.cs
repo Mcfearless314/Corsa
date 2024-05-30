@@ -9,7 +9,7 @@ namespace Backend.DeviceEventHandlers;
 public class DeviceWantsToCheckRegistrationDto : BaseDto
 {
     [Required]
-    [MinLength(8)]
+    [MinLength(7)]
     public string DeviceId { get; set; }
 }
 
