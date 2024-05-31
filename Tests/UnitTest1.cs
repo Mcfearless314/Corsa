@@ -26,13 +26,6 @@ public class Tests
         using var cmd = new NpgsqlCommand(sqlScript, conn);
         cmd.ExecuteNonQuery();
         
-        var ws = new WebSocketTestClient();
-        ws.Send(new ClientWantsToRegisterDto
-        {
-            Username = "Miran",
-            Email = "Test1@gmail.com",
-            Password = "Miran12345",
-        });
     }
 
 
@@ -40,12 +33,20 @@ public class Tests
     public async Task Test_1LogInTest()
     {
         var ws = await new WebSocketTestClient().ConnectAsync();
+        await ws.DoAndAssert(new ClientWantsToRegisterDto
+        {
+            Username = "Miran",
+            Email = "Test1@gmail.com",
+            Password = "Miran12345",
+        },fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+        );
+        
         await ws.DoAndAssert(new ClientWantsToLogInDto
             {
                 Username = "Miran",
                 Password = "Miran12345",
             },
-            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsLogin)) == 1; }
         );
     }
     
@@ -53,15 +54,16 @@ public class Tests
     [Test]
     public async Task Test_2LogARunTest()
     {
-        
         var ws = await new WebSocketTestClient().ConnectAsync();
-        await ws.DoAndAssert(new ClientWantsToLogInDto
+        await ws.DoAndAssert(new ClientWantsToRegisterDto
             {
                 Username = "Miran",
+                Email = "Test1@gmail.com",
                 Password = "Miran12345",
-            },
-            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+            },fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
         );
+        
+        
         
         await ws.DoAndAssert(new ClientWantsToLogARunDto
             {
@@ -79,13 +81,14 @@ public class Tests
     public async Task Test_3RegisterADevice()
     {
         var ws = await new WebSocketTestClient().ConnectAsync();
-        await ws.DoAndAssert(new ClientWantsToLogInDto
+        await ws.DoAndAssert(new ClientWantsToRegisterDto
             {
                 Username = "Miran",
+                Email = "Test1@gmail.com",
                 Password = "Miran12345",
-            },
-            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+            },fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
         );
+        
         
         
         await ws.DoAndAssert(new ClientWantsToRegisterADeviceDto
@@ -115,14 +118,13 @@ public class Tests
     public async Task Test_5LogARunAndDeleteIt()
     {
         var ws = await new WebSocketTestClient().ConnectAsync();
-        await ws.DoAndAssert(new ClientWantsToLogInDto
+        await ws.DoAndAssert(new ClientWantsToRegisterDto
             {
                 Username = "Miran",
+                Email = "Test1@gmail.com",
                 Password = "Miran12345",
-            },
-            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+            },fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
         );
-        
         
         
         DateTime now = DateTime.Now;
