@@ -15,4 +15,8 @@ Flespitoken = A token for a MQTT broker
 JWT_SECRET = A Secret used to encode JWT Tokens, a new one can be created by typing: "openssl rand -base64 64" into the CLI
 JWT_LIFETIME = Lifetime in hours for JWT tokens expressed like a double i.e: "15.0"
 
+The Frontend is publish on the link:
+
+Corsa-6c128.web.app
+
 This project was made by Miran Komadina
