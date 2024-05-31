@@ -43,6 +43,7 @@ public class ClientWantsToLogIn : BaseEventHandler<ClientWantsToLogInDto>
             // Creating a token from the user
             var token = _jwtService.IssueToken(SessionData.FromUser(user!));
             StateService.SetUserId(socket, user.id);
+            StateService.AuthenticateUser(socket, user.id);
             // Send the token to the client
             await socket.Send(JsonSerializer.Serialize(new ServerConfirmsLogin
             {

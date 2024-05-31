@@ -52,6 +52,7 @@ public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
         else
         {
             StateService.SetUserId(socket, userId);
+            StateService.AuthenticateUser(socket, userId);
             // Registration successful
             var response = new ServerConfirmsRegistration()
             {
