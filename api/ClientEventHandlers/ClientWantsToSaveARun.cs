@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.EventFilters;
 using Backend.service;
 using Fleck;
 using lib;
@@ -17,6 +18,7 @@ public class ClientWantsToSaveARunDto : BaseDto
 
 }
 
+[AuthenticationFilter]
 public class ClientWantsToSaveARun : BaseEventHandler<ClientWantsToSaveARunDto>
 {
     private RunService _runService;

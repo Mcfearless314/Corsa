@@ -43,8 +43,7 @@ public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
         var userId = _accountService.Register(dto.Username, dto.Email, dto.Password);
         if (userId <= 0)
         {
-            // Registration failed
-            var response = new ServerConfirmsRegistration()
+            var response = new ServerDeniesRegistration()
             {
                 Message = "Registration failed"
             };
@@ -52,6 +51,7 @@ public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
         }
         else
         {
+            StateService.AuthenticateUser(socket, userId);
             // Registration successful
             var response = new ServerConfirmsRegistration()
             {
@@ -68,4 +68,9 @@ public class ServerConfirmsRegistration : BaseDto
 {
     public string Message { get; set; }
     public int UserId { get; set; }
+}
+
+public class ServerDeniesRegistration : BaseDto
+{
+    public string Message { get; set; }
 }

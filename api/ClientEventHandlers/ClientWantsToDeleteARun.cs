@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Threading.Tasks;
+using Backend.EventFilters;
 using Backend.service;
 using Fleck;
 using lib;
@@ -13,6 +14,7 @@ public class ClientWantsToDeleteARunDto : BaseDto
     public string RunId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToDeleteARun : BaseEventHandler<ClientWantsToDeleteARunDto>
 {
     private RunService _runService;

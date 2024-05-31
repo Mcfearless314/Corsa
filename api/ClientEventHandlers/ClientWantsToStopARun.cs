@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.EventFilters;
 using Backend.infrastructure.dataModels;
 using Backend.service;
 using Fleck;
@@ -17,6 +18,7 @@ public class ClientWantsToStopARunDto : BaseDto
     public string RunId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToStopARun : BaseEventHandler<ClientWantsToStopARunDto>
 {
     private RunService _runService;

@@ -1,28 +1,59 @@
-﻿using System.Threading.RateLimiting;
+﻿using System.Collections.Concurrent;
+using System.Threading.RateLimiting;
 using Fleck;
 
-namespace Backend.service;
-
-public class WsWithMetaData(IWebSocketConnection connection)
+namespace Backend.service
 {
-    public IWebSocketConnection Connection { get; set; } = connection;
-    public bool IsAuthenticated { get; set; } = false;
-    
-}
-
-public static class StateService
-{
-    private static readonly Dictionary<Guid, WsWithMetaData> _connections = new();
-
-    public static void AddConnection(Guid clientId, IWebSocketConnection ws)
+    public class WsWithMetaData
     {
-        _connections.TryAdd(clientId, new WsWithMetaData(ws));
+        public int UserId { get; set; }
+        public bool IsAuthenticated { get; set; }
     }
 
-
-    public static void RemoveConnection(Guid clientId)
+    public static class StateService
     {
-        _connections.Remove(clientId);
+        private static readonly ConcurrentDictionary<IWebSocketConnection, WsWithMetaData> _connections = new();
+
+        public static void AddConnection(IWebSocketConnection ws)
+        {
+            _connections.TryAdd(ws, new WsWithMetaData());
+        }
+
+        public static void AuthenticateConnection(IWebSocketConnection ws, int userId)
+        {
+            if (_connections.TryGetValue(ws, out var wsWithMetaData))
+            {
+                wsWithMetaData.UserId = userId;
+                wsWithMetaData.IsAuthenticated = true;
+            }
+        }
+
+        public static WsWithMetaData GetMetaData(IWebSocketConnection ws)
+        {
+            return _connections[ws];
+        }
+
+        public static bool IsAuthenticated(IWebSocketConnection ws)
+        {
+            return _connections.TryGetValue(ws, out var wsWithMetaData) && wsWithMetaData.IsAuthenticated;
+        }
+
+        public static void RemoveConnection(IWebSocketConnection ws)
+        {
+            _connections.TryRemove(ws, out _);
+        }
+        
+        public static void AuthenticateUser(IWebSocketConnection ws, int userId)
+        {
+            if (_connections.TryGetValue(ws, out var wsWithMetaData))
+            {
+                wsWithMetaData.UserId = userId;
+                wsWithMetaData.IsAuthenticated = true;
+            }
+            else
+            {
+                throw new Exception("Connection not found");
+            }
+        }
     }
-   
 }

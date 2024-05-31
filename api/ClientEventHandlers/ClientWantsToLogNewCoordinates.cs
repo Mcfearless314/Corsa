@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Backend.EventFilters;
 using Backend.service;
 using Fleck;
 using lib;
@@ -17,6 +18,7 @@ public class ClientWantsToLogNewCoordinatesDto : BaseDto
     public string RunId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToLogNewCoordinates : BaseEventHandler<ClientWantsToLogNewCoordinatesDto>
 {
     private RunService _runService;

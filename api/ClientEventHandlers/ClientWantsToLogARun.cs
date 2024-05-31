@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Backend.EventFilters;
 using Backend.infrastructure;
 using Backend.service;
 using Fleck;
@@ -20,6 +21,7 @@ public class ClientWantsToLogARunDto : BaseDto
     public int UserId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToLogARun : BaseEventHandler<ClientWantsToLogARunDto>
 {
     private RunService _runService;

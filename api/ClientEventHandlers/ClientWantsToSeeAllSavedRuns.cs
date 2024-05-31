@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.EventFilters;
 using Backend.infrastructure.dataModels;
 using Backend.service;
 using Fleck;
@@ -11,6 +12,7 @@ public class ClientWantsToSeeAllSavedRunsDto : BaseDto
     public int UserId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToSeeAllSavedRuns : BaseEventHandler<ClientWantsToSeeAllSavedRunsDto>
 {
     private RunService _runService;

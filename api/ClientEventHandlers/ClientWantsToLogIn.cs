@@ -37,6 +37,7 @@ public class ClientWantsToLogIn : BaseEventHandler<ClientWantsToLogInDto>
     public override async Task Handle(ClientWantsToLogInDto dto, IWebSocketConnection socket)
     {
         var user = _accountService.Authenticate(dto.Username, dto.Password);
+        StateService.AuthenticateUser(socket, user!.id);
     
         // Creating a token from the user
         var token = _jwtService.IssueToken(SessionData.FromUser(user!));

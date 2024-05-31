@@ -74,11 +74,11 @@ public static class Startup
             
             ws.OnClose = () =>
             {
-                StateService.RemoveConnection(ws.ConnectionInfo.Id);
+                StateService.RemoveConnection(ws);
                 keepAliveTimer.Stop();
             };
 
-            ws.OnOpen =  () => { StateService.AddConnection(ws.ConnectionInfo.Id, ws); };
+            ws.OnOpen =  () => { StateService.AddConnection(ws); };
 
             ws.OnMessage = async message =>
             {

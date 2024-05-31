@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.EventFilters;
 using Backend.infrastructure.dataModels;
 using Backend.service;
 using Fleck;
@@ -13,6 +14,7 @@ public class ClientWantsToSeeFullInfoOfRunDto : BaseDto
     public string RunId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToSeeFullInfoOfRun : BaseEventHandler<ClientWantsToSeeFullInfoOfRunDto>
 {
     private RunService _runService;

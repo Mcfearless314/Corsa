@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Backend.EventFilters;
 using Backend.service;
 using Backend.infrastructure.dataModels;
 using Fleck;
@@ -11,6 +12,7 @@ public class ClientWantsToSeeAProgressOfAllRunsDto  : BaseDto
     public int UserId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToSeeAProgressOfAllRuns : BaseEventHandler<ClientWantsToSeeAProgressOfAllRunsDto>
 {
     private RunService _runService;

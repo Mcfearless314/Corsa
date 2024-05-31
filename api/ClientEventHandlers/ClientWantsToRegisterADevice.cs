@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Backend.EventFilters;
 using Backend.service;
 using Fleck;
 using lib;
@@ -15,6 +16,7 @@ public class ClientWantsToRegisterADeviceDto : BaseDto
     public int UserId { get; set; }
 }
 
+[AuthenticationFilter]
 public class ClientWantsToRegisterADevice : BaseEventHandler<ClientWantsToRegisterADeviceDto> {
     
     private AccountService _accountService;
