@@ -6,5 +6,7 @@
 	
 	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/EnvironmentVariablesIndexed/=DBConnectionString/@EntryIndexedValue">postgres://dmoiwszd:D0hUQqfndJWubjGnzNT9a0I3aKsYsO4Y@balarama.db.elephantsql.com/dmoiwszd</s:String>
 	<s:Boolean x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/EnvironmentVariablesIndexed/=DOTNET_005FENVIRONMENT/@EntryIndexRemoved">True</s:Boolean>
+	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/EnvironmentVariablesIndexed/=JWT_005FLIFETIME/@EntryIndexedValue">4.0</s:String>
+	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/EnvironmentVariablesIndexed/=JWT_005FSECRET/@EntryIndexedValue">bqxT8zqlR+jzNepQU6C/gmpBTKXhUsShticcXGWbbWzmvM9cGshgxrKmhhrSMRhj3jRt9V1Gr3u+qjRACN3gpQ== </s:String>
 	<s:Boolean x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/EnvironmentVariablesIndexed/=RESHARPER_005FHOST_005FVERSION/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/EnvironmentVariablesIndexed/=RESHARPER_005FHOST/@EntryIndexRemoved">True</s:Boolean></wpf:ResourceDictionary>

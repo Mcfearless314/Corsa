@@ -1,6 +1,4 @@
 using Backend;
-using Microsoft.Extensions.Configuration;
-using Websocket.Client;
 using Backend.service;
 using Backend.ClientEventHandlers;
 using Backend.exceptions;
@@ -27,27 +25,24 @@ public class Tests
         // Execute the SQL script
         using var cmd = new NpgsqlCommand(sqlScript, conn);
         cmd.ExecuteNonQuery();
+        
+        var ws = new WebSocketTestClient();
+        ws.Send(new ClientWantsToRegisterDto
+        {
+            Username = "Miran",
+            Email = "Test1@gmail.com",
+            Password = "Miran12345",
+        });
     }
 
 
     [Test]
-    public async Task Test_1RegistrationTest()
+    public async Task Test_1LogInTest()
     {
         var ws = await new WebSocketTestClient().ConnectAsync();
-        await ws.DoAndAssert(new ClientWantsToRegisterDto
+        await ws.DoAndAssert(new ClientWantsToLogInDto
             {
                 Username = "Miran",
-                Email = "Test@gmail.com",
-                Password = "Miran12345",
-            },
-            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(UserAlreadyExistsException)) == 1; }
-        );
-
-        var ws2 = await new WebSocketTestClient().ConnectAsync();
-        await ws2.DoAndAssert(new ClientWantsToRegisterDto
-            {
-                Username = "Miran2",
-                Email = "Test@gmail.com",
                 Password = "Miran12345",
             },
             fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
@@ -58,8 +53,17 @@ public class Tests
     [Test]
     public async Task Test_2LogARunTest()
     {
-        var ws2 = await new WebSocketTestClient().ConnectAsync();
-        await ws2.DoAndAssert(new ClientWantsToLogARunDto
+        
+        var ws = await new WebSocketTestClient().ConnectAsync();
+        await ws.DoAndAssert(new ClientWantsToLogInDto
+            {
+                Username = "Miran",
+                Password = "Miran12345",
+            },
+            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+        );
+        
+        await ws.DoAndAssert(new ClientWantsToLogARunDto
             {
                 UserId = 1,
                 RunStartTime = DateTime.Now,
@@ -74,8 +78,17 @@ public class Tests
     [Test]
     public async Task Test_3RegisterADevice()
     {
-        var ws2 = await new WebSocketTestClient().ConnectAsync();
-        await ws2.DoAndAssert(new ClientWantsToRegisterADeviceDto
+        var ws = await new WebSocketTestClient().ConnectAsync();
+        await ws.DoAndAssert(new ClientWantsToLogInDto
+            {
+                Username = "Miran",
+                Password = "Miran12345",
+            },
+            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+        );
+        
+        
+        await ws.DoAndAssert(new ClientWantsToRegisterADeviceDto
             {
                 UserId = 1,
                 DeviceId = "123456789",
@@ -101,11 +114,22 @@ public class Tests
     [Test]
     public async Task Test_5LogARunAndDeleteIt()
     {
+        var ws = await new WebSocketTestClient().ConnectAsync();
+        await ws.DoAndAssert(new ClientWantsToLogInDto
+            {
+                Username = "Miran",
+                Password = "Miran12345",
+            },
+            fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerConfirmsRegistration)) == 1; }
+        );
+        
+        
+        
         DateTime now = DateTime.Now;
         string runStartTime = now.ToString("s");
         int userId = 1;
         string runId = $"{userId}_{runStartTime!.Replace("/", "").Replace(":", "").Replace(" ", "")}";
-        var ws = await new WebSocketTestClient().ConnectAsync();
+
         await ws.DoAndAssert(new ClientWantsToLogARunDto
             {
                 UserId = userId,
@@ -115,9 +139,8 @@ public class Tests
             },
             fromServer => { return fromServer.Count(dto => dto.eventType == nameof(ServerSendsBackRunId)) == 1; }
         );
-
-        var ws2 = await new WebSocketTestClient().ConnectAsync();
-        await ws2.DoAndAssert(new ClientWantsToDeleteARunDto
+        
+        await ws.DoAndAssert(new ClientWantsToDeleteARunDto
             {
                 UserId = 1,
                 RunId = runId,

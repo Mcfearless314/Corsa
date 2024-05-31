@@ -20,13 +20,13 @@ public class ClientWantsToRegisterDto : BaseDto
     public string Username { get; set; }
     
     [Required]
-    [MinLength(8)]
+    [MinLength(7)]
     [MaxLength(32)]
     public string Password { get; set; }
 
 }
 
-//[RateLimiter(2,30,1,1)]
+[RateLimiter(2,30,1,1)]
 public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
 {
     private AccountService _accountService;
@@ -51,7 +51,7 @@ public class ClientWantsToRegister : BaseEventHandler<ClientWantsToRegisterDto>
         }
         else
         {
-            StateService.AuthenticateUser(socket, userId);
+            StateService.SetUserId(socket, userId);
             // Registration successful
             var response = new ServerConfirmsRegistration()
             {
