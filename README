@@ -1,0 +1,18 @@
+Corsra is Italian for running, and run information is the main focus of Corsa. It stores GPS coordinates and timestamps and calculates distances between those coordinates. The coordinates are used in the frontend to vizualize the route on the users request.
+
+Corsa is a WebSocket which connects to the Corsa-Frontend and recieves events which it reads, unpakcs and stores in a PostGreSQL database. It also sends out json objects back to the front with information. 
+
+It also subscribes to a MQTT broker to recieve packages from a IoT device with GPS coordinates.
+
+The project is published on Heroku on the following link:
+
+https://corsa-fe16c283132e.herokuapp.com/
+
+It uses 4 Environement variables
+
+DBConnectonString = A connection string for the Database like ElephantSQL
+Flespitoken = A token for a MQTT broker
+JWT_SECRET = A Secret used to encode JWT Tokens, a new one can be created by typing: "openssl rand -base64 64" into the CLI
+JWT_LIFETIME = Lifetime in hours for JWT tokens expressed like a double i.e: "15.0"
+
+This project was made by Miran Komadina
